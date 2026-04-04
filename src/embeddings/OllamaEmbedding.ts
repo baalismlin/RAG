@@ -18,23 +18,23 @@ export class OllamaEmbedding implements IEmbedding {
   }
 
   async embedDocuments(texts: string[]): Promise<number[][]> {
-    const results: number[][] = [];
+    const response = await fetch(`${this.baseUrl}/api/embed`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: this.model, input: texts }),
+    });
 
-    for (const text of texts) {
-      const response = await fetch(`${this.baseUrl}/api/embeddings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: this.model, prompt: text }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ollama embedding failed: ${response.statusText}`);
-      }
-
-      const data = (await response.json()) as { embedding: number[] };
-      results.push(data.embedding);
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      throw new Error(
+        `Ollama embedding failed (${response.status} ${response.statusText}) ` +
+        `for model "${this.model}" at ${this.baseUrl}. ` +
+        `Make sure the model is pulled: docker exec -it rag-ollama ollama pull ${this.model}` +
+        (body ? `\nDetails: ${body}` : "")
+      );
     }
 
-    return results;
+    const data = (await response.json()) as { embeddings: number[][] };
+    return data.embeddings;
   }
 }
