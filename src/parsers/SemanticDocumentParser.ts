@@ -86,6 +86,7 @@ export class SemanticDocumentParser implements IDocumentParser {
       end = Math.min(end, text.length);
       const prefix = section ? `[${section}]\n` : "";
       chunks.push(prefix + text.slice(start, end).trim());
+      if (end >= text.length) break;
       start = end - this.chunkOverlap;
     }
 

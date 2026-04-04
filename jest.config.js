@@ -9,7 +9,7 @@ const config = {
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: { module: "commonjs", moduleResolution: "node" } }],
   },
-  testPathPattern: "\\.(test|spec)\\.tsx?$",
+  testMatch: ["**/*.test.ts", "**/*.spec.ts"],
   collectCoverageFrom: ["src/**/*.{ts,tsx}", "!src/app/**", "!src/**/*.d.ts"],
   coverageDirectory: "coverage",
 };

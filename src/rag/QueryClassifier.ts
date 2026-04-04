@@ -24,7 +24,7 @@ export class QueryClassifier {
     const docScore = DOC_KEYWORDS.filter((kw) => lower.includes(kw)).length;
 
     if (codeScore === 0 && docScore === 0) return "hybrid";
-    if (codeScore > docScore) return "code";
+    if (codeScore >= docScore && codeScore > 0) return "code";
     if (docScore > codeScore) return "document";
     return "hybrid";
   }
