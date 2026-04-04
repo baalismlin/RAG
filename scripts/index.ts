@@ -8,13 +8,24 @@ import { VectorStoreFactory } from "../src/vectorstore/VectorStoreFactory";
 import { IndexingService } from "../src/indexer/IndexingService";
 
 async function main() {
-  const docsPath = process.argv[2] ?? process.env.DATA_DOCS_PATH ?? "./data/docs";
-  const codePath = process.argv[3] ?? process.env.DATA_CODE_PATH ?? "./data/code";
+  const args = process.argv.slice(2);
+  const reset = args.includes("--reset");
+  const positional = args.filter((a) => !a.startsWith("--"));
+  const docsPath = positional[0] ?? process.env.DATA_DOCS_PATH ?? "./data/docs";
+  const codePath = positional[1] ?? process.env.DATA_CODE_PATH ?? "./data/code";
 
   console.log("🔧 Initializing embedding and vector stores...");
   const embedding = EmbeddingFactory.create("ollama");
   const docStore = VectorStoreFactory.createDocumentStore(embedding);
   const codeStore = VectorStoreFactory.createCodeStore(embedding);
+
+  if (reset) {
+    console.log("🗑️  Resetting collections...");
+    await docStore.deleteCollection();
+    await codeStore.deleteCollection();
+    console.log("   Collections cleared.");
+  }
+
   const indexer = new IndexingService(docStore, codeStore);
 
   console.log(`📄 Indexing documents from: ${docsPath}`);

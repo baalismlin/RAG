@@ -1,6 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
+import { createHash } from "crypto";
 import { IDocumentParser } from "@/core/interfaces/IParser";
 import { DocumentChunk } from "@/core/types/Document";
+
+function chunkId(source: string, index: number): string {
+  return createHash("sha256").update(`${source}::${index}`).digest("hex").slice(0, 32);
+}
 
 const DEFAULT_CHUNK_SIZE = 1000;
 const DEFAULT_CHUNK_OVERLAP = 200;
@@ -22,7 +26,7 @@ export class SemanticDocumentParser implements IDocumentParser {
       const sectionChunks = this.chunkText(section.content, section.heading);
       for (const chunkContent of sectionChunks) {
         chunks.push({
-          id: uuidv4(),
+          id: chunkId(source, chunks.length),
           content: chunkContent,
           metadata: {
             source,
@@ -96,7 +100,7 @@ export class SemanticDocumentParser implements IDocumentParser {
   private fallbackChunk(content: string, source: string): DocumentChunk[] {
     return [
       {
-        id: uuidv4(),
+        id: chunkId(source, 0),
         content: content.slice(0, this.chunkSize),
         metadata: { source, type: "markdown", chunkIndex: 0 },
       },

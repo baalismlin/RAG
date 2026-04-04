@@ -1,7 +1,11 @@
-import { v4 as uuidv4 } from "uuid";
+import { createHash } from "crypto";
 import * as path from "path";
 import { ICodeParser } from "@/core/interfaces/IParser";
 import { CodeChunk, CodeMetadata } from "@/core/types/Document";
+
+function chunkId(source: string, qualifier: string): string {
+  return createHash("sha256").update(`${source}::${qualifier}`).digest("hex").slice(0, 32);
+}
 
 interface ParsedSymbol {
   name: string;
@@ -23,7 +27,7 @@ export class CodeStructuralParser implements ICodeParser {
     }
 
     return symbols.map((sym, i) => ({
-      id: uuidv4(),
+      id: chunkId(source, `${sym.name}::${sym.type}::${sym.startLine}`),
       content: sym.content,
       metadata: {
         source,
@@ -162,7 +166,7 @@ export class CodeStructuralParser implements ICodeParser {
     while (start < content.length) {
       const slice = content.slice(start, start + MAX);
       chunks.push({
-        id: uuidv4(),
+        id: chunkId(source, `fallback::${idx}`),
         content: slice,
         metadata: {
           source,
