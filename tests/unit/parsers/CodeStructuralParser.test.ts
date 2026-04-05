@@ -1,4 +1,4 @@
-import { CodeStructuralParser } from "../../../src/parsers/CodeStructuralParser";
+import { CodeStructuralParser } from "@/parsers/CodeStructuralParser";
 
 describe("CodeStructuralParser", () => {
   let parser: CodeStructuralParser;

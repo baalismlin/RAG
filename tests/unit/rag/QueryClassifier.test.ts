@@ -1,4 +1,4 @@
-import { QueryClassifier } from "../../../src/rag/QueryClassifier";
+import { QueryClassifier } from "@/rag/QueryClassifier";
 
 describe("QueryClassifier", () => {
   let classifier: QueryClassifier;

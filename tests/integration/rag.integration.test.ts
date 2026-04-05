@@ -3,13 +3,13 @@
  * These tests use real parsers/retrievers but mock the vector store and LLM.
  */
 
-import { SemanticDocumentParser } from "../../src/parsers/SemanticDocumentParser";
-import { CodeStructuralParser } from "../../src/parsers/CodeStructuralParser";
-import { ContextBuilder } from "../../src/rag/ContextBuilder";
-import { QueryClassifier } from "../../src/rag/QueryClassifier";
-import { HybridRetriever } from "../../src/retrievers/HybridRetriever";
-import { IRetriever } from "../../src/core/interfaces/IRetriever";
-import { RetrievedChunk } from "../../src/core/types/QueryResult";
+import { SemanticDocumentParser } from "@/parsers/SemanticDocumentParser";
+import { CodeStructuralParser } from "@/parsers/CodeStructuralParser";
+import { ContextBuilder } from "@/rag/ContextBuilder";
+import { QueryClassifier } from "@/rag/QueryClassifier";
+import { HybridRetriever } from "@/retrievers/HybridRetriever";
+import { IRetriever } from "@/core/interfaces/IRetriever";
+import { RetrievedChunk } from "@/core/types/QueryResult";
 
 function makeRetriever(chunks: RetrievedChunk[]): IRetriever {
   return { retrieve: async () => chunks };

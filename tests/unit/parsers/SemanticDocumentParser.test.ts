@@ -1,4 +1,4 @@
-import { SemanticDocumentParser } from "../../../src/parsers/SemanticDocumentParser";
+import { SemanticDocumentParser } from "@/parsers/SemanticDocumentParser";
 
 describe("SemanticDocumentParser", () => {
   let parser: SemanticDocumentParser;
