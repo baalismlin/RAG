@@ -12,6 +12,23 @@ export interface IndexingResult {
   errors: string[];
 }
 
+interface ManifestEntry {
+  mtime: number;
+  size: number;
+}
+
+interface FileManifest {
+  files: Record<string, ManifestEntry>;
+  lastSync: string;
+}
+
+export interface SyncResult extends IndexingResult {
+  added: number;
+  updated: number;
+  removed: number;
+  unchanged: number;
+}
+
 export class IndexingService {
   private readonly docStore: IVectorStore;
   private readonly codeStore: IVectorStore;
@@ -88,6 +105,95 @@ export class IndexingService {
     }
 
     return result;
+  }
+
+  async syncDirectory(dirPath: string, manifestPath?: string): Promise<SyncResult> {
+    const resolvedManifest = manifestPath ?? path.join(dirPath, ".index-manifest.json");
+    const manifest = await this.loadManifest(resolvedManifest);
+
+    const result: SyncResult = {
+      totalFiles: 0, totalChunks: 0, docChunks: 0, codeChunks: 0,
+      errors: [], added: 0, updated: 0, removed: 0, unchanged: 0,
+    };
+
+    const currentFiles = (await this.collectFiles(dirPath))
+      .filter((f) => LoaderFactory.getLoader(f) !== null);
+
+    const currentSet = new Set(currentFiles);
+
+    for (const trackedPath of Object.keys(manifest.files)) {
+      if (!currentSet.has(trackedPath)) {
+        try {
+          await this.docStore.deleteChunksBySource(trackedPath);
+          await this.codeStore.deleteChunksBySource(trackedPath);
+          delete manifest.files[trackedPath];
+          result.removed++;
+        } catch (err) {
+          result.errors.push(`Failed to remove deleted file ${trackedPath}: ${String(err)}`);
+        }
+      }
+    }
+
+    for (const filePath of currentFiles) {
+      let stat: { mtime: number; size: number };
+      try {
+        const s = await fs.stat(filePath);
+        stat = { mtime: s.mtimeMs, size: s.size };
+      } catch (err) {
+        result.errors.push(`Cannot stat ${filePath}: ${String(err)}`);
+        continue;
+      }
+
+      const entry = manifest.files[filePath];
+      const isNew = !entry;
+      const isChanged = entry && (entry.mtime !== stat.mtime || entry.size !== stat.size);
+
+      if (!isNew && !isChanged) {
+        result.unchanged++;
+        continue;
+      }
+
+      if (!isNew) {
+        try {
+          await this.docStore.deleteChunksBySource(filePath);
+          await this.codeStore.deleteChunksBySource(filePath);
+        } catch (err) {
+          result.errors.push(`Failed to clear old chunks for ${filePath}: ${String(err)}`);
+          continue;
+        }
+      }
+
+      const fileResult = await this.indexFile(filePath);
+      result.totalFiles++;
+      result.docChunks += fileResult.docChunks;
+      result.codeChunks += fileResult.codeChunks;
+      result.totalChunks += fileResult.totalChunks;
+      result.errors.push(...fileResult.errors);
+
+      if (fileResult.errors.length === 0) {
+        manifest.files[filePath] = stat;
+        if (isNew) result.added++;
+        else result.updated++;
+      }
+    }
+
+    manifest.lastSync = new Date().toISOString();
+    await this.saveManifest(resolvedManifest, manifest);
+
+    return result;
+  }
+
+  private async loadManifest(manifestPath: string): Promise<FileManifest> {
+    try {
+      const raw = await fs.readFile(manifestPath, "utf-8");
+      return JSON.parse(raw) as FileManifest;
+    } catch {
+      return { files: {}, lastSync: "" };
+    }
+  }
+
+  private async saveManifest(manifestPath: string, manifest: FileManifest): Promise<void> {
+    await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf-8");
   }
 
   private async collectFiles(dirPath: string): Promise<string[]> {

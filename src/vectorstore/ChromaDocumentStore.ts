@@ -73,6 +73,11 @@ export class ChromaDocumentStore implements IVectorStore {
     this.collection = null;
   }
 
+  async deleteChunksBySource(source: string): Promise<void> {
+    const collection = await this.getCollection();
+    await collection.delete({ where: { source } });
+  }
+
   async count(): Promise<number> {
     const collection = await this.getCollection();
     return collection.count();

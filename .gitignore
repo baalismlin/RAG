@@ -32,3 +32,6 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+# Indexer manifest (local runtime artifact)
+.index-manifest.json

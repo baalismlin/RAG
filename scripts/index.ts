@@ -10,6 +10,7 @@ import { IndexingService } from "../src/indexer/IndexingService";
 async function main() {
   const args = process.argv.slice(2);
   const reset = args.includes("--reset");
+  const sync = args.includes("--sync");
   const positional = args.filter((a) => !a.startsWith("--"));
   const docsPath = positional[0] ?? process.env.DATA_DOCS_PATH ?? "./data/docs";
   const codePath = positional[1] ?? process.env.DATA_CODE_PATH ?? "./data/code";
@@ -27,6 +28,32 @@ async function main() {
   }
 
   const indexer = new IndexingService(docStore, codeStore);
+
+  if (sync) {
+    console.log("🔄 Sync mode: only indexing changed/new files...");
+
+    console.log(`📄 Syncing documents from: ${docsPath}`);
+    const docResult = await indexer.syncDirectory(path.resolve(docsPath));
+
+    console.log(`💻 Syncing code from: ${codePath}`);
+    const codeResult = await indexer.syncDirectory(path.resolve(codePath));
+
+    const errors = [...docResult.errors, ...codeResult.errors];
+
+    console.log("\n✅ Sync complete!");
+    console.log(`   Added     : ${docResult.added + codeResult.added}`);
+    console.log(`   Updated   : ${docResult.updated + codeResult.updated}`);
+    console.log(`   Removed   : ${docResult.removed + codeResult.removed}`);
+    console.log(`   Unchanged : ${docResult.unchanged + codeResult.unchanged}`);
+    console.log(`   Doc chunks  : ${docResult.docChunks + codeResult.docChunks}`);
+    console.log(`   Code chunks : ${docResult.codeChunks + codeResult.codeChunks}`);
+
+    if (errors.length > 0) {
+      console.warn("\n⚠️  Errors:");
+      errors.forEach((e) => console.warn("  -", e));
+    }
+    return;
+  }
 
   console.log(`📄 Indexing documents from: ${docsPath}`);
   const docResult = await indexer.indexDirectory(path.resolve(docsPath));

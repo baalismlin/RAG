@@ -11,6 +11,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "index": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/index.ts",
+    "index:sync": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/index.ts --sync",
     "chroma": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/chroma.ts"
   },
   "dependencies": {
