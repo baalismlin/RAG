@@ -32,6 +32,25 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres:
+    image: postgres:16-alpine
+    container_name: rag-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: rag
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: rag
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
 volumes:
   ollama_data:
   chroma_data:
+  postgres_data:

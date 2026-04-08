@@ -3,6 +3,8 @@ import * as path from "path";
 import { IVectorStore } from "@/core/interfaces/IVectorStore";
 import { LoaderFactory } from "@/loaders/LoaderFactory";
 import { AnyChunk, isCodeChunk } from "@/core/types/Document";
+import { CodeKnowledgeStore } from "@/code/CodeKnowledgeStore";
+import { RelationExtractor } from "@/ast/RelationExtractor";
 
 export interface IndexingResult {
   totalFiles: number;
@@ -32,10 +34,13 @@ export interface SyncResult extends IndexingResult {
 export class IndexingService {
   private readonly docStore: IVectorStore;
   private readonly codeStore: IVectorStore;
+  private readonly codeKnowledge?: CodeKnowledgeStore;
+  private readonly relationExtractor = new RelationExtractor();
 
-  constructor(docStore: IVectorStore, codeStore: IVectorStore) {
+  constructor(docStore: IVectorStore, codeStore: IVectorStore, codeKnowledge?: CodeKnowledgeStore) {
     this.docStore = docStore;
     this.codeStore = codeStore;
+    this.codeKnowledge = codeKnowledge;
   }
 
   async indexDirectory(dirPath: string): Promise<IndexingResult> {
@@ -59,6 +64,10 @@ export class IndexingService {
           } else {
             docChunks.push(chunk);
           }
+        }
+
+        if (this.codeKnowledge && chunks.some(isCodeChunk)) {
+          await this.indexCodeKnowledge(file, chunks.filter(isCodeChunk));
         }
       } catch (err) {
         result.errors.push(`Failed to load ${file}: ${String(err)}`);
@@ -95,7 +104,12 @@ export class IndexingService {
       const codeChunks = chunks.filter(isCodeChunk);
 
       if (docChunks.length > 0) await this.docStore.addChunks(docChunks);
-      if (codeChunks.length > 0) await this.codeStore.addChunks(codeChunks);
+      if (codeChunks.length > 0) {
+        await this.codeStore.addChunks(codeChunks);
+        if (this.codeKnowledge) {
+          await this.indexCodeKnowledge(filePath, codeChunks);
+        }
+      }
 
       result.docChunks = docChunks.length;
       result.codeChunks = codeChunks.length;
@@ -105,6 +119,13 @@ export class IndexingService {
     }
 
     return result;
+  }
+
+  private async indexCodeKnowledge(filePath: string, _chunks: AnyChunk[]): Promise<void> {
+    const content = await fs.readFile(filePath, "utf-8").catch(() => "");
+    if (!content || !this.codeKnowledge) return;
+    const { symbols, relations } = this.relationExtractor.extract(content, filePath);
+    await this.codeKnowledge.indexCodeFile(_chunks, symbols, relations);
   }
 
   async syncDirectory(dirPath: string, manifestPath?: string): Promise<SyncResult> {
@@ -126,6 +147,7 @@ export class IndexingService {
         try {
           await this.docStore.deleteChunksBySource(trackedPath);
           await this.codeStore.deleteChunksBySource(trackedPath);
+          await this.codeKnowledge?.deleteByFile(trackedPath);
           delete manifest.files[trackedPath];
           result.removed++;
         } catch (err) {
@@ -157,6 +179,7 @@ export class IndexingService {
         try {
           await this.docStore.deleteChunksBySource(filePath);
           await this.codeStore.deleteChunksBySource(filePath);
+          await this.codeKnowledge?.deleteByFile(filePath);
         } catch (err) {
           result.errors.push(`Failed to clear old chunks for ${filePath}: ${String(err)}`);
           continue;

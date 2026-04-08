@@ -188,3 +188,4 @@ Response:
 - **Add a new embedding provider**: implement `IEmbedding` and add to `EmbeddingFactory`
 - **Improve reranking**: replace `RerankRetriever.rerankScores()` with a cross-encoder model call
 - **Add agent capabilities**: wrap `RAGService` with a LangChain agent loop
+- **Improve chunking strategy**: modify `Chunker` to use section aware chunking and add overlapping windows
