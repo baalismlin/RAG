@@ -13,8 +13,7 @@ export class CodeKnowledgeStore implements IContentStore {
     private readonly graphStore: IGraphStore
   ) {}
 
-  async indexFile(
-    filePath: string,
+  async save(
     chunks: AnyChunk[],
     symbols?: CodeSymbol[],
     relations?: SymbolRelation[]
@@ -23,13 +22,6 @@ export class CodeKnowledgeStore implements IContentStore {
       this.vectorStore.addChunks(chunks),
       symbols ? this.symbolStore.upsertSymbols(symbols) : Promise.resolve(),
       relations ? this.graphStore.upsertRelations(relations) : Promise.resolve(),
-    ])
-  }
-
-  async indexCodeFile(symbols: CodeSymbol[], relations: SymbolRelation[]): Promise<void> {
-    await Promise.all([
-      this.symbolStore.upsertSymbols(symbols),
-      this.graphStore.upsertRelations(relations),
     ])
   }
 

@@ -135,7 +135,7 @@ export class IndexingService {
       if (isCode) {
         // Use UnifiedCodeParser for code files (parse once for chunks, symbols, relations)
         const parsed = await this.codeParser.parse(filePath)
-        await this.codeStore.indexFile(filePath, parsed.chunks, parsed.symbols, parsed.relations)
+        await this.codeStore.save(parsed.chunks, parsed.symbols, parsed.relations)
         result.codeChunks = parsed.chunks.length
         result.totalChunks = parsed.chunks.length
       } else {
@@ -144,9 +144,9 @@ export class IndexingService {
         const docChunks = chunks.filter((c) => !isCodeChunk(c))
         const codeChunks = chunks.filter(isCodeChunk)
 
-        if (docChunks.length > 0) await this.docStore.indexFile(filePath, docChunks)
+        if (docChunks.length > 0) await this.docStore.save(docChunks)
         if (codeChunks.length > 0) {
-          await this.codeStore.indexFile(filePath, codeChunks)
+          await this.codeStore.save(codeChunks)
         }
 
         result.docChunks = docChunks.length

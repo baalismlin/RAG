@@ -7,8 +7,7 @@ import { CodeSymbol, SymbolRelation } from "@/core/types/CodeKnowledge"
 export class DocumentStore implements IContentStore {
   constructor(private readonly vectorStore: IVectorStore) {}
 
-  async indexFile(
-    filePath: string,
+  async save(
     chunks: AnyChunk[],
     symbols?: CodeSymbol[],
     relations?: SymbolRelation[]

@@ -9,13 +9,11 @@ import { CodeSymbol, SymbolRelation } from "../types/CodeKnowledge"
 export interface IContentStore extends IStorage {
   /**
    * Index content from a file.
-   * @param filePath - The file path to index
    * @param chunks - The chunks to store
    * @param symbols - Optional symbols to store (for code stores)
    * @param relations - Optional relations to store (for code stores)
    */
-  indexFile(
-    filePath: string,
+  save(
     chunks: AnyChunk[],
     symbols?: CodeSymbol[],
     relations?: SymbolRelation[]
