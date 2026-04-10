@@ -1,4 +1,4 @@
-import { RetrievedChunk } from "../types/QueryResult";
+import { RetrievedChunk } from "../types/QueryResult"
 
 /**
  * Retriever interface for fetching relevant chunks from a vector store.
@@ -12,7 +12,7 @@ export interface IRetriever {
    * @param topK - Maximum number of results to return (default varies by implementation)
    * @returns Array of retrieved chunks with similarity scores
    */
-  retrieve(query: string, topK?: number): Promise<RetrievedChunk[]>;
+  retrieve(query: string, topK?: number): Promise<RetrievedChunk[]>
 }
 
 /**
@@ -29,5 +29,5 @@ export interface IRerankRetriever extends IRetriever {
    * @param rerankTopK - Number of candidates to retrieve before reranking (typically > topK)
    * @returns Reranked array of retrieved chunks with scores
    */
-  retrieveAndRerank(query: string, topK?: number, rerankTopK?: number): Promise<RetrievedChunk[]>;
+  retrieveAndRerank(query: string, topK?: number, rerankTopK?: number): Promise<RetrievedChunk[]>
 }

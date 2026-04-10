@@ -33,11 +33,11 @@ Frontend (Next.js + Tailwind CSS)
 
 ## Prerequisites
 
-| Requirement | Version | Notes |
-|---|---|---|
-| Node.js | ≥ 20 | |
-| Ollama | latest | `ollama.ai` |
-| ChromaDB | ≥ 0.4 | Run locally |
+| Requirement | Version | Notes       |
+| ----------- | ------- | ----------- |
+| Node.js     | ≥ 20    |             |
+| Ollama      | latest  | `ollama.ai` |
+| ChromaDB    | ≥ 0.4   | Run locally |
 
 ## Quick Start
 
@@ -156,6 +156,7 @@ npm run test:coverage
 ```
 
 Response:
+
 ```json
 {
   "answer": "...",
@@ -172,6 +173,7 @@ Response:
 ```
 
 Response:
+
 ```json
 {
   "totalFiles": 5,

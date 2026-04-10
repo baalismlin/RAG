@@ -21,10 +21,10 @@ const nextConfig = {
         "tree-sitter-typescript",
         "tree-sitter-javascript",
         "tree-sitter-python",
-      ];
+      ]
     }
-    return config;
+    return config
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

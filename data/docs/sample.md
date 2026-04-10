@@ -27,6 +27,7 @@ Ollama (local LLM + embeddings)
 ### Loader
 
 Loaders read raw files from disk and delegate to parsers. Supported formats:
+
 - **Markdown** (`.md`, `.mdx`) — via `MarkdownLoader`
 - **PDF** (`.pdf`) — via `PDFLoader`
 - **Code** (`.ts`, `.tsx`, `.js`, `.jsx`, `.py`) — via `CodeLoader`
@@ -48,6 +49,7 @@ Default model: `nomic-embed-text`. Swappable via `EmbeddingFactory`.
 ### Vector Store (Dual Index)
 
 Two separate ChromaDB collections are maintained:
+
 - `rag_documents` — document chunks
 - `rag_code` — code symbol chunks
 
@@ -56,6 +58,7 @@ This separation allows independent tuning of retrieval for each domain.
 ### Retriever
 
 Three retriever strategies:
+
 - `DocumentRetriever` — queries the document index only
 - `CodeRetriever` — queries the code index only
 - `HybridRetriever` — queries both, merges by score
@@ -66,6 +69,7 @@ re-scoring. Replace with a cross-encoder for production quality reranking.
 ### RAG Service
 
 The `RAGService` is the single entry point for queries:
+
 1. `QueryClassifier` labels the query as `document`, `code`, or `hybrid`
 2. The appropriate retriever fetches top-K chunks
 3. `ContextBuilder` assembles the context string (max 6000 chars)
@@ -76,14 +80,14 @@ The `RAGService` is the single entry point for queries:
 
 Copy `.env.example` to `.env.local` and set:
 
-| Variable | Default | Description |
-|---|---|---|
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
-| `OLLAMA_MODEL` | `llama3.2` | Chat model name |
-| `OLLAMA_EMBEDDING_MODEL` | `nomic-embed-text` | Embedding model |
-| `CHROMA_URL` | `http://localhost:8000` | ChromaDB server URL |
-| `DATA_DOCS_PATH` | `./data/docs` | Path to index documents |
-| `DATA_CODE_PATH` | `./data/code` | Path to index code |
+| Variable                 | Default                  | Description             |
+| ------------------------ | ------------------------ | ----------------------- |
+| `OLLAMA_BASE_URL`        | `http://localhost:11434` | Ollama server URL       |
+| `OLLAMA_MODEL`           | `llama3.2`               | Chat model name         |
+| `OLLAMA_EMBEDDING_MODEL` | `nomic-embed-text`       | Embedding model         |
+| `CHROMA_URL`             | `http://localhost:8000`  | ChromaDB server URL     |
+| `DATA_DOCS_PATH`         | `./data/docs`            | Path to index documents |
+| `DATA_CODE_PATH`         | `./data/code`            | Path to index code      |
 
 ## Getting Started
 

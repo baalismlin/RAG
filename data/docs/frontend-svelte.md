@@ -7,12 +7,15 @@ Svelte is a radical approach to building user interfaces. Unlike traditional fra
 ## Core Philosophy
 
 ### Compile-Time Framework
+
 Svelte converts components into efficient imperative code that surgically updates the DOM. There's no virtual DOM diffing process, leading to better performance and smaller bundle sizes.
 
 ### Write Less Code
+
 Svelte reduces boilerplate significantly. Components are written with minimal ceremony, automatically handling reactivity without explicit state management calls.
 
 ### True Reactivity
+
 Variables are reactive by default. Assigning a new value to a variable automatically triggers updates in the UI.
 
 ## Component Structure
@@ -40,17 +43,22 @@ Svelte components are defined in `.svelte` files with three optional sections:
 ## Reactivity System
 
 ### Reactive Declarations
+
 Use `$:` label to mark statements as reactive:
+
 ```svelte
 $: doubled = count * 2;
 $: if (count > 10) alert('Too high!');
 ```
 
 ### Reactive Statements
+
 Any top-level statement can be made reactive, automatically re-running when dependencies change.
 
 ### Stores
+
 Svelte provides writable, readable, and derived stores for global state management:
+
 - writable: Create stores with get/set methods
 - readable: Stores with external control
 - derived: Compute values from other stores
@@ -58,6 +66,7 @@ Svelte provides writable, readable, and derived stores for global state manageme
 ## Templating Features
 
 ### Logic Blocks
+
 ```svelte
 {#if condition}
   <p>Condition is true</p>
@@ -79,12 +88,15 @@ Svelte provides writable, readable, and derived stores for global state manageme
 ```
 
 ### Event Handling
+
 - DOM events: `on:eventname`
 - Component events: `on:eventname`
 - Event modifiers: `|preventDefault`, `|stopPropagation`, `|once`, `|self`
 
 ### Bindings
+
 Two-way data binding for form elements:
+
 - `bind:value` for inputs
 - `bind:checked` for checkboxes
 - `bind:group` for radio buttons
@@ -93,6 +105,7 @@ Two-way data binding for form elements:
 ## Transitions and Animations
 
 Built-in transition directives:
+
 - fade: Opacity transition
 - fly: Translation and opacity
 - slide: Height transition
@@ -104,6 +117,7 @@ Custom transitions can be defined using CSS or JavaScript.
 ## SvelteKit
 
 Full-stack framework built on Svelte providing:
+
 - File-based routing
 - Server-side rendering
 - API endpoints

@@ -7,12 +7,15 @@ Ruby on Rails, often simply called Rails, is a server-side web application frame
 ## Core Principles
 
 ### Convention Over Configuration
+
 Rails makes assumptions about what you want to do and how to do it, reducing the need for explicit configuration.
 
 ### Don't Repeat Yourself (DRY)
+
 Every piece of knowledge should have a single, unambiguous representation in the system.
 
 ### MVC Architecture
+
 - Model: Data layer and business logic
 - View: Presentation layer
 - Controller: Handles requests and coordinates models/views
@@ -43,24 +46,25 @@ myapp/
 ## Routing
 
 ### config/routes.rb
+
 ```ruby
 Rails.application.routes.draw do
   # Root route
   root 'home#index'
-  
+
   # Resources (generates all CRUD routes)
   resources :articles
   resources :users do
     resources :posts  # Nested resources
   end
-  
+
   # Custom routes
   get 'about', to: 'pages#about'
   post 'search', to: 'search#index'
-  
+
   # Named routes
   get 'profile', to: 'users#show', as: :user_profile
-  
+
   # API namespace
   namespace :api do
     namespace :v1 do
@@ -71,6 +75,7 @@ end
 ```
 
 ### Route Helpers
+
 ```ruby
 articles_path      # /articles
 new_article_path   # /articles/new
@@ -81,36 +86,37 @@ edit_article_path(@article)  # /articles/:id/edit
 ## Controllers
 
 ### app/controllers/articles_controller.rb
+
 ```ruby
 class ArticlesController < ApplicationController
   before_action :set_article, only: [:show, :edit, :update, :destroy]
   before_action :authenticate_user!, except: [:index, :show]
-  
+
   # GET /articles
   def index
     @articles = Article.all.order(created_at: :desc).page(params[:page])
   end
-  
+
   # GET /articles/:id
   def show
   end
-  
+
   # GET /articles/new
   def new
     @article = Article.new
   end
-  
+
   # POST /articles
   def create
     @article = current_user.articles.build(article_params)
-    
+
     if @article.save
       redirect_to @article, notice: 'Article was successfully created.'
     else
       render :new, status: :unprocessable_entity
     end
   end
-  
+
   # PATCH/PUT /articles/:id
   def update
     if @article.update(article_params)
@@ -119,19 +125,19 @@ class ArticlesController < ApplicationController
       render :edit, status: :unprocessable_entity
     end
   end
-  
+
   # DELETE /articles/:id
   def destroy
     @article.destroy
     redirect_to articles_url, notice: 'Article was successfully deleted.'
   end
-  
+
   private
-  
+
   def set_article
     @article = Article.find(params[:id])
   end
-  
+
   def article_params
     params.require(:article).permit(:title, :content, :published, :category_ids => [])
   end
@@ -141,6 +147,7 @@ end
 ## Models
 
 ### Active Record
+
 ```ruby
 class Article < ApplicationRecord
   # Associations
@@ -149,39 +156,39 @@ class Article < ApplicationRecord
   has_many :taggings, dependent: :destroy
   has_many :tags, through: :taggings
   has_one_attached :featured_image  # Active Storage
-  
+
   # Validations
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :content, presence: true
   validates :slug, uniqueness: true
-  
+
   # Callbacks
   before_save :generate_slug
   after_create :send_notification
-  
+
   # Scopes
   scope :published, -> { where(published: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :by_category, ->(category) { where(category: category) }
-  
+
   # Instance methods
   def word_count
     content.split.size
   end
-  
+
   # Class methods
   def self.most_commented
     left_joins(:comments)
       .group(:id)
       .order('COUNT(comments.id) DESC')
   end
-  
+
   private
-  
+
   def generate_slug
     self.slug = title.parameterize
   end
-  
+
   def send_notification
     ArticleMailer.new_article(self).deliver_later
   end
@@ -189,6 +196,7 @@ end
 ```
 
 ### Migrations
+
 ```ruby
 class CreateArticles < ActiveRecord::Migration[7.0]
   def change
@@ -198,10 +206,10 @@ class CreateArticles < ActiveRecord::Migration[7.0]
       t.string :slug, null: false
       t.boolean :published, default: false
       t.references :user, null: false, foreign_key: true
-      
+
       t.timestamps
     end
-    
+
     add_index :articles, :slug, unique: true
     add_index :articles, :published
   end
@@ -211,6 +219,7 @@ end
 ## Views
 
 ### ERB Templates
+
 ```erb
 <!-- app/views/articles/index.html.erb -->
 <h1>Articles</h1>
@@ -222,11 +231,11 @@ end
     <article class="article-card">
       <h2><%= link_to article.title, article %></h2>
       <p class="meta">
-        By <%= article.user.name %> 
+        By <%= article.user.name %>
         on <%= article.created_at.strftime('%B %d, %Y') %>
       </p>
       <p><%= truncate(article.content, length: 200) %></p>
-      
+
       <% if article.tags.any? %>
         <div class="tags">
           <% article.tags.each do |tag| %>
@@ -242,6 +251,7 @@ end
 ```
 
 ### Layouts
+
 ```erb
 <!-- app/views/layouts/application.html.erb -->
 <!DOCTYPE html>
@@ -255,15 +265,15 @@ end
   </head>
   <body>
     <%= render 'shared/navbar' %>
-    
+
     <% if notice %>
       <div class="alert alert-success"><%= notice %></div>
     <% end %>
-    
+
     <main>
       <%= yield %>
     </main>
-    
+
     <%= render 'shared/footer' %>
   </body>
 </html>
@@ -301,6 +311,7 @@ Article.pluck(:title)  # Returns array of titles
 ## Rails Console
 
 Interactive Ruby environment:
+
 ```bash
 rails console
 rails c  # shorthand
@@ -335,6 +346,7 @@ rails destroy scaffold Article
 ## Testing
 
 ### Minitest (default)
+
 ```ruby
 # test/models/article_test.rb
 class ArticleTest < ActiveSupport::TestCase
@@ -342,7 +354,7 @@ class ArticleTest < ActiveSupport::TestCase
     article = Article.new
     assert_not article.save, "Saved the article without a title"
   end
-  
+
   test "should generate slug" do
     article = Article.create!(title: 'Hello World')
     assert_equal 'hello-world', article.slug
@@ -351,6 +363,7 @@ end
 ```
 
 ### RSpec (popular alternative)
+
 ```ruby
 # spec/models/article_spec.rb
 describe Article do
@@ -358,7 +371,7 @@ describe Article do
     article = build(:article)
     expect(article).to be_valid
   end
-  
+
   it "is not valid without a title" do
     article = build(:article, title: nil)
     expect(article).not_to be_valid
@@ -372,7 +385,7 @@ end
 # app/jobs/send_email_job.rb
 class SendEmailJob < ApplicationJob
   queue_as :default
-  
+
   def perform(user_id)
     user = User.find(user_id)
     UserMailer.welcome_email(user).deliver_now
@@ -441,6 +454,7 @@ rails credentials:edit
 ## Deployment
 
 Common platforms:
+
 - Heroku (PaaS)
 - AWS (EC2, Elastic Beanstalk)
 - Digital Ocean

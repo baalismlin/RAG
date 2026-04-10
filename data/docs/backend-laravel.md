@@ -7,15 +7,19 @@ Laravel is a free, open-source PHP web framework created by Taylor Otwell. It fo
 ## Core Concepts
 
 ### Eloquent ORM
+
 Advanced ActiveRecord implementation for working with databases.
 
 ### Blade Templating
+
 Lightweight yet powerful templating engine.
 
 ### Artisan CLI
+
 Command-line interface with numerous helpful commands.
 
 ### Migration System
+
 Database version control for team collaboration.
 
 ## Project Structure
@@ -54,6 +58,7 @@ myapp/
 ## Routing
 
 ### routes/web.php
+
 ```php
 <?php
 use Illuminate\Support\Facades\Route;
@@ -99,6 +104,7 @@ Route::get('/posts/{post:slug}', [PostController::class, 'show']);
 ## Controllers
 
 ### app/Http/Controllers/UserController.php
+
 ```php
 <?php
 namespace App\Http\Controllers;
@@ -125,7 +131,7 @@ class UserController extends Controller
     {
         $validated = $request->validated();
         $user = User::create($validated);
-        
+
         return new UserResource($user);
     }
 
@@ -133,7 +139,7 @@ class UserController extends Controller
     {
         $validated = $request->validated();
         $user->update($validated);
-        
+
         return new UserResource($user);
     }
 
@@ -148,6 +154,7 @@ class UserController extends Controller
 ## Eloquent Models
 
 ### app/Models/User.php
+
 ```php
 <?php
 namespace App\Models;
@@ -218,6 +225,7 @@ class User extends Authenticatable
 ```
 
 ### Migrations
+
 ```php
 <?php
 use Illuminate\Database\Migrations\Migration;
@@ -237,7 +245,7 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->rememberToken();
             $table->timestamps();
-            
+
             $table->index('email');
         });
     }
@@ -252,55 +260,47 @@ return new class extends Migration
 ## Blade Templates
 
 ### resources/views/layouts/app.blade.php
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>@yield('title', 'My App')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
+  </head>
+  <body>
     @include('partials.nav')
-    
-    <main>
-        @yield('content')
-    </main>
-    
+
+    <main>@yield('content')</main>
+
     @include('partials.footer')
-</body>
+  </body>
 </html>
 ```
 
 ### resources/views/users/index.blade.php
+
 ```html
-@extends('layouts.app')
+@extends('layouts.app') @section('title', 'Users') @section('content')
+<h1>Users</h1>
 
-@section('title', 'Users')
+@if($users->count())
+<ul>
+  @foreach($users as $user)
+  <li>
+    <a href="{{ route('users.show', $user) }}"> {{ $user->name }} </a>
 
-@section('content')
-    <h1>Users</h1>
-    
-    @if($users->count())
-        <ul>
-            @foreach($users as $user)
-                <li>
-                    <a href="{{ route('users.show', $user) }}">
-                        {{ $user->name }}
-                    </a>
-                    
-                    @if($user->isAdmin())
-                        <span class="badge">Admin</span>
-                    @endif
-                </li>
-            @endforeach
-        </ul>
-        
-        {{ $users->links() }}
-    @else
-        <p>No users found.</p>
+    @if($user->isAdmin())
+    <span class="badge">Admin</span>
     @endif
-@endsection
+  </li>
+  @endforeach
+</ul>
+
+{{ $users->links() }} @else
+<p>No users found.</p>
+@endif @endsection
 ```
 
 ## Query Builder
@@ -342,6 +342,7 @@ DB::table('users')
 ## Validation
 
 ### Form Requests
+
 ```php
 <?php
 namespace App\Http\Requests;
@@ -427,9 +428,9 @@ class UserTest extends TestCase
     public function test_can_list_users(): void
     {
         User::factory()->count(3)->create();
-        
+
         $response = $this->getJson('/api/users');
-        
+
         $response->assertStatus(200)
             ->assertJsonCount(3, 'data');
     }
@@ -441,7 +442,7 @@ class UserTest extends TestCase
             'email' => 'john@example.com',
             'password' => 'password123',
         ]);
-        
+
         $response->assertCreated()
             ->assertJsonPath('data.name', 'John Doe');
     }

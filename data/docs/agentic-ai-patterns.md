@@ -187,6 +187,7 @@ can approve, reject, or redirect.
 
 The system prompt defines the agent's identity, capabilities, constraints, and output format.
 Effective system prompts in 2026:
+
 - Explicitly list available tools and when to use each
 - State what the agent should do when it does not know the answer
 - Define the expected output format and any schema

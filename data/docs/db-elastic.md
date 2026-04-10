@@ -7,18 +7,23 @@ Elasticsearch is a distributed, RESTful search and analytics engine capable of a
 ## Core Concepts
 
 ### Index
+
 An index is a collection of documents with similar characteristics. It's the equivalent of a database in relational databases.
 
 ### Document
+
 A document is a basic unit of information that can be indexed. Expressed in JSON format.
 
 ### Type (deprecated in ES 7+)
+
 Previously used to define document types within an index, now removed in favor of single type per index.
 
 ### Mapping
+
 Schema definition that defines how documents and their fields are stored and indexed.
 
 ### Cluster and Nodes
+
 - **Cluster**: Collection of nodes holding data
 - **Node**: Single server in the cluster
 - **Shard**: Partition of an index
@@ -27,6 +32,7 @@ Schema definition that defines how documents and their fields are stored and ind
 ## REST API Basics
 
 ### Index Operations
+
 ```bash
 # Create index
 PUT /products
@@ -58,6 +64,7 @@ GET /products/_mapping
 ```
 
 ### Document Operations
+
 ```bash
 # Index (create/update) document
 PUT /products/_doc/1
@@ -103,6 +110,7 @@ POST /_bulk
 ## Search Queries
 
 ### Basic Search
+
 ```bash
 # Search all
 GET /products/_search
@@ -130,6 +138,7 @@ GET /products/_search
 ```
 
 ### Term-Level Queries
+
 ```bash
 # Exact match
 GET /products/_search
@@ -176,6 +185,7 @@ GET /products/_search
 ```
 
 ### Compound Queries
+
 ```bash
 # Bool query
 GET /products/_search
@@ -201,6 +211,7 @@ GET /products/_search
 ```
 
 ### Full-Text Search
+
 ```bash
 # Match phrase
 GET /articles/_search
@@ -240,6 +251,7 @@ GET /products/_search
 ## Aggregations
 
 ### Metric Aggregations
+
 ```bash
 GET /products/_search
 {
@@ -262,6 +274,7 @@ GET /products/_search
 ```
 
 ### Bucket Aggregations
+
 ```bash
 # Terms aggregation (group by)
 GET /products/_search
@@ -322,6 +335,7 @@ GET /products/_search
 ## Analyzers and Text Analysis
 
 ### Built-in Analyzers
+
 - **standard**: Splits on word boundaries, lowercases, removes stop words
 - **simple**: Non-letter tokenizer, lowercase filter
 - **whitespace**: Splits on whitespace only
@@ -329,6 +343,7 @@ GET /products/_search
 - **pattern**: Regex-based tokenizer
 
 ### Custom Analyzer
+
 ```bash
 PUT /my_index
 {
@@ -360,6 +375,7 @@ PUT /my_index
 ```
 
 ### Testing Analyzers
+
 ```bash
 POST /_analyze
 {
@@ -378,6 +394,7 @@ POST /_analyze
 ## Mappings
 
 ### Dynamic Mapping
+
 ```bash
 # Enable/disable dynamic mapping
 PUT /my_index
@@ -392,14 +409,15 @@ PUT /my_index
 ```
 
 ### Field Data Types
+
 ```bash
 PUT /products
 {
   "mappings": {
     "properties": {
       "name": { "type": "text", "analyzer": "standard" },
-      "name_keyword": { 
-        "type": "keyword", 
+      "name_keyword": {
+        "type": "keyword",
         "fields": { "keyword": { "type": "keyword" } }
       },
       "price": { "type": "float" },
@@ -513,23 +531,27 @@ POST /_security/user/jacknich
 ## Common Use Cases
 
 ### E-Commerce Search
+
 - Full-text product search
 - Faceted navigation (aggregations)
 - Auto-suggest
 - Personalized ranking
 
 ### Log Analytics
+
 - Centralized logging
 - Real-time monitoring
 - Alerting
 - Historical analysis
 
 ### Security Analytics
+
 - SIEM data storage
 - Threat detection
 - Anomaly detection
 
 ### APM (Application Performance Monitoring)
+
 - Distributed tracing
 - Service metrics
 - Error tracking

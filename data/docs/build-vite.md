@@ -7,13 +7,17 @@ Vite is a next-generation frontend build tool created by Evan You (creator of Vu
 ## Core Concepts
 
 ### Dev Server
+
 Vite's development server uses native ES modules, providing:
+
 - Instant server start (no bundling needed)
 - Lightning-fast hot module replacement (HMR)
 - On-demand compilation of modules
 
 ### Production Build
+
 For production, Vite bundles code using Rollup:
+
 - Highly optimized static assets
 - Code splitting
 - Tree shaking
@@ -22,6 +26,7 @@ For production, Vite bundles code using Rollup:
 ## Getting Started
 
 ### Installation
+
 ```bash
 # npm
 npm create vite@latest my-project
@@ -37,6 +42,7 @@ bun create vite my-project
 ```
 
 ### Project Templates
+
 ```bash
 # Available templates
 npm create vite@latest my-project -- --template react
@@ -55,88 +61,90 @@ npm create vite@latest my-project -- --template vue-ts
 ## Configuration
 
 ### vite.config.js/ts
+
 ```javascript
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+import { resolve } from "path"
 
 export default defineConfig({
   // Plugins
   plugins: [react()],
-  
+
   // Path aliases
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      '@components': resolve(__dirname, 'src/components'),
-      '@assets': resolve(__dirname, 'src/assets')
-    }
+      "@": resolve(__dirname, "src"),
+      "@components": resolve(__dirname, "src/components"),
+      "@assets": resolve(__dirname, "src/assets"),
+    },
   },
-  
+
   // Server configuration
   server: {
     port: 3000,
     open: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
+      "/api": {
+        target: "http://localhost:8080",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
     },
     cors: true,
     hmr: {
-      overlay: true
-    }
+      overlay: true,
+    },
   },
-  
+
   // Build configuration
   build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
+    outDir: "dist",
+    assetsDir: "assets",
     sourcemap: true,
-    minify: 'terser',
+    minify: "terser",
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['@mui/material']
-        }
-      }
+          vendor: ["react", "react-dom"],
+          ui: ["@mui/material"],
+        },
+      },
     },
-    chunkSizeWarningLimit: 500
+    chunkSizeWarningLimit: 500,
   },
-  
+
   // Preview configuration
   preview: {
     port: 4173,
-    open: true
+    open: true,
   },
-  
+
   // CSS configuration
   css: {
     devSourcemap: true,
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "./src/styles/variables.scss";`
-      }
-    }
+        additionalData: `@import "./src/styles/variables.scss";`,
+      },
+    },
   },
-  
+
   // Environment variables
-  envDir: './env',
-  envPrefix: 'VITE_',
-  
+  envDir: "./env",
+  envPrefix: "VITE_",
+
   // Define global constants
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.npm_package_version)
-  }
-});
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+  },
+})
 ```
 
 ## Features
 
 ### Hot Module Replacement (HMR)
+
 ```javascript
 // Vite handles HMR automatically for:
 // - React (via @vitejs/plugin-react)
@@ -148,18 +156,19 @@ if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
     if (newModule) {
       // New module is loaded
-      newModule.render();
+      newModule.render()
     }
-  });
-  
+  })
+
   import.meta.hot.dispose((data) => {
     // Cleanup before module is replaced
-    data.someData = 'preserve this';
-  });
+    data.someData = "preserve this"
+  })
 }
 ```
 
 ### Environment Variables
+
 ```javascript
 // .env
 VITE_API_URL=https://api.example.com
@@ -178,86 +187,88 @@ console.log(import.meta.env.SSR);         // true in SSR
 ```
 
 ### Static Asset Handling
+
 ```javascript
 // Import assets
-import logo from './assets/logo.png';
+import logo from "./assets/logo.png"
 
 // Import as URL
-import logoUrl from './assets/logo.png?url';
+import logoUrl from "./assets/logo.png?url"
 
 // Import as raw string
-import rawSvg from './assets/icon.svg?raw';
+import rawSvg from "./assets/icon.svg?raw"
 
 // Import as worker
-import Worker from './worker.js?worker';
+import Worker from "./worker.js?worker"
 
 // Import as shared worker
-import SharedWorker from './shared-worker.js?sharedworker';
+import SharedWorker from "./shared-worker.js?sharedworker"
 
 // Inline worker
-import InlineWorker from './worker.js?worker&inline';
+import InlineWorker from "./worker.js?worker&inline"
 ```
 
 ### CSS Features
+
 ```javascript
 // CSS imports with side effects
-import './global.css';
+import "./global.css"
 
 // CSS modules
-import styles from './Component.module.css';
+import styles from "./Component.module.css"
 
 // Scoped CSS (Vue SFC, Svelte)
-<style scoped>
-/* Component-scoped styles */
-</style>
+;<style scoped>/* Component-scoped styles */</style>
 
 // CSS preprocessor (Sass/SCSS, Less, Stylus)
-import './styles.scss';
+import "./styles.scss"
 
 // CSS with PostCSS (automatic)
 // postcss.config.js
 module.exports = {
   plugins: {
     tailwindcss: {},
-    autoprefixer: {}
-  }
-};
+    autoprefixer: {},
+  },
+}
 ```
 
 ## Plugins
 
 ### Official Plugins
+
 ```javascript
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import vue from '@vitejs/plugin-vue';
-import svelte from '@sveltejs/vite-plugin-svelte';
-import legacy from '@vitejs/plugin-legacy';
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+import vue from "@vitejs/plugin-vue"
+import svelte from "@sveltejs/vite-plugin-svelte"
+import legacy from "@vitejs/plugin-legacy"
 
 export default defineConfig({
   plugins: [
     react({
-      include: '**/*.{jsx,tsx}',
+      include: "**/*.{jsx,tsx}",
       babel: {
-        plugins: ['styled-components']
-      }
+        plugins: ["styled-components"],
+      },
     }),
-    
+
     // Legacy browser support
     legacy({
-      targets: ['defaults', 'not IE 11']
-    })
-  ]
-});
+      targets: ["defaults", "not IE 11"],
+    }),
+  ],
+})
 ```
 
 ### Community Plugins
+
 ```javascript
-import { defineConfig } from 'vite';
-import { visualizer } from 'rollup-plugin-visualizer';
-import compression from 'vite-plugin-compression';
-import svgr from 'vite-plugin-svgr';
-import checker from 'vite-plugin-checker';
+import { defineConfig } from "vite"
+import { visualizer } from "rollup-plugin-visualizer"
+import compression from "vite-plugin-compression"
+import svgr from "vite-plugin-svgr"
+import checker from "vite-plugin-checker"
 
 export default defineConfig({
   plugins: [
@@ -265,30 +276,31 @@ export default defineConfig({
     visualizer({
       open: true,
       gzipSize: true,
-      brotliSize: true
+      brotliSize: true,
     }),
-    
+
     // Gzip compression
     compression({
-      algorithm: 'gzip',
-      ext: '.gz'
+      algorithm: "gzip",
+      ext: ".gz",
     }),
-    
+
     // SVG as React components
     svgr(),
-    
+
     // TypeScript checker overlay
     checker({
       typescript: true,
-      eslint: { lintCommand: 'eslint "./src/**/*.{ts,tsx}"' }
-    })
-  ]
-});
+      eslint: { lintCommand: 'eslint "./src/**/*.{ts,tsx}"' },
+    }),
+  ],
+})
 ```
 
 ## Build Optimizations
 
 ### Code Splitting
+
 ```javascript
 export default defineConfig({
   build: {
@@ -296,74 +308,75 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           // Split vendor code
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'react-vendor';
-            if (id.includes('lodash')) return 'lodash';
-            return 'vendor';
+          if (id.includes("node_modules")) {
+            if (id.includes("react")) return "react-vendor"
+            if (id.includes("lodash")) return "lodash"
+            return "vendor"
           }
-          
+
           // Split by route
-          if (id.includes('src/pages/admin')) return 'admin';
-          if (id.includes('src/pages/dashboard')) return 'dashboard';
-        }
-      }
-    }
-  }
-});
+          if (id.includes("src/pages/admin")) return "admin"
+          if (id.includes("src/pages/dashboard")) return "dashboard"
+        },
+      },
+    },
+  },
+})
 ```
 
 ### Dynamic Imports
+
 ```javascript
 // Lazy load components
-const AdminPanel = lazy(() => import('./AdminPanel'));
+const AdminPanel = lazy(() => import("./AdminPanel"))
 
 // Prefetch components
 const prefetchComponent = () => {
-  const component = import(/* webpackPrefetch: true */ './HeavyComponent');
-};
+  const component = import(/* webpackPrefetch: true */ "./HeavyComponent")
+}
 ```
 
 ## SSR Configuration
 
 ```javascript
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite"
 
 export default defineConfig({
   build: {
     ssr: true,
     rollupOptions: {
-      input: './src/entry-server.js'
-    }
-  }
-});
+      input: "./src/entry-server.js",
+    },
+  },
+})
 ```
 
 ## Library Mode
 
 ```javascript
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { defineConfig } from "vite"
+import { resolve } from "path"
 
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'lib/main.ts'),
-      name: 'MyLib',
-      fileName: 'my-lib',
-      formats: ['es', 'umd']
+      entry: resolve(__dirname, "lib/main.ts"),
+      name: "MyLib",
+      fileName: "my-lib",
+      formats: ["es", "umd"],
     },
     rollupOptions: {
       // Externalize deps that shouldn't be bundled
-      external: ['react', 'react-dom'],
+      external: ["react", "react-dom"],
       output: {
         globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM'
-        }
-      }
-    }
-  }
-});
+          react: "React",
+          "react-dom": "ReactDOM",
+        },
+      },
+    },
+  },
+})
 ```
 
 ## CLI Commands
@@ -390,14 +403,14 @@ vite build --mode staging
 
 ## Comparison with Other Tools
 
-| Feature | Vite | webpack | Create React App |
-|---------|------|---------|------------------|
-| Dev server start | Instant | Slow | Slow |
-| HMR | Fast | Slower | Slower |
-| Build speed | Fast | Slower | Slower |
-| Config | Simple | Complex | Hidden |
-| Bundle size | Optimized | Optimized | Larger |
-| Modern standards | Yes | Configurable | Limited |
+| Feature          | Vite      | webpack      | Create React App |
+| ---------------- | --------- | ------------ | ---------------- |
+| Dev server start | Instant   | Slow         | Slow             |
+| HMR              | Fast      | Slower       | Slower           |
+| Build speed      | Fast      | Slower       | Slower           |
+| Config           | Simple    | Complex      | Hidden           |
+| Bundle size      | Optimized | Optimized    | Larger           |
+| Modern standards | Yes       | Configurable | Limited          |
 
 ## Best Practices
 

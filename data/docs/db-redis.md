@@ -7,22 +7,27 @@ Redis (Remote Dictionary Server) is an open-source, in-memory data structure sto
 ## Key Features
 
 ### In-Memory Storage
+
 All data is stored in RAM, providing extremely fast read and write operations (sub-millisecond latency).
 
 ### Persistence Options
+
 - **RDB (Redis Database)**: Point-in-time snapshots
 - **AOF (Append Only File)**: Log every write operation
 - Hybrid approach combining both
 
 ### Data Structures
+
 Native support for complex data types beyond simple key-value pairs.
 
 ### High Availability
+
 Redis Sentinel for automatic failover and Redis Cluster for automatic partitioning.
 
 ## Data Types
 
 ### Strings
+
 ```bash
 # Basic operations
 SET user:1:name "John"
@@ -43,6 +48,7 @@ EXPIRE session:abc 1800  # Update expiration
 ```
 
 ### Hashes
+
 ```bash
 # Store objects
 HSET user:1 name "John" email "john@example.com" age 30
@@ -58,6 +64,7 @@ HDEL user:1 age
 ```
 
 ### Lists
+
 ```bash
 # Push operations
 LPUSH queue:tasks "task1"
@@ -81,6 +88,7 @@ LREM queue:tasks 1 "task1"  # Remove 1 occurrence
 ```
 
 ### Sets
+
 ```bash
 # Add and remove
 SADD tags:post:1 "redis" "database" "cache"
@@ -102,6 +110,7 @@ SPOP tags:post:1  # Remove and return random member
 ```
 
 ### Sorted Sets
+
 ```bash
 # Add with scores
 ZADD leaderboard 100 "player1" 85 "player2" 120 "player3"
@@ -128,6 +137,7 @@ ZPOPMAX leaderboard 1  # Remove highest
 ```
 
 ### Bitmaps
+
 ```bash
 # Bit operations
 SETBIT user:login:2024-01-01 100 1  # User 100 logged in on Jan 1
@@ -139,6 +149,7 @@ BITOP AND result user:login:01 user:login:02
 ```
 
 ### HyperLogLogs
+
 ```bash
 # Probabilistic cardinality counting
 PFADD visitors:2024-01-01 "user1" "user2" "user3"
@@ -149,6 +160,7 @@ PFMERGE visitors:month visitors:week1 visitors:week2
 ```
 
 ### Geospatial
+
 ```bash
 # Add locations
 GEOADD cities -74.0060 40.7128 "New York" -122.4194 37.7749 "San Francisco"
@@ -163,6 +175,7 @@ GEORADIUSBYMEMBER cities "New York" 100 km
 ```
 
 ### Streams
+
 ```bash
 # Add to stream
 XADD events * type login user_id 123
@@ -185,6 +198,7 @@ XINFO STREAM events
 ## Key Patterns
 
 ### Key Naming Convention
+
 ```
 object-type:id:field
 user:100:name
@@ -193,6 +207,7 @@ session:abc123:data
 ```
 
 ### Key Expiration Patterns
+
 ```bash
 # Session management
 SET session:user:100 "data" EX 1800
@@ -261,6 +276,7 @@ EVALSHA sha1_hash 1 mykey
 ## Persistence
 
 ### RDB Configuration
+
 ```conf
 save 900 1      # Save if 1 key changed in 900 seconds
 save 300 10     # Save if 10 keys changed in 300 seconds
@@ -270,6 +286,7 @@ dir /var/lib/redis
 ```
 
 ### AOF Configuration
+
 ```conf
 appendonly yes
 appendfilename "appendonly.aof"
@@ -300,6 +317,7 @@ redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 \
 ## Common Use Cases
 
 ### Caching
+
 ```bash
 # Check cache
 GET cache:user:100
@@ -309,24 +327,28 @@ SETEX cache:user:100 3600 serialized_user_data
 ```
 
 ### Session Store
+
 ```bash
 SET session:abc123 "user_data_json"
 EXPIRE session:abc123 1800
 ```
 
 ### Rate Limiting
+
 ```bash
 INCR rate_limit:user:100
 EXPIRE rate_limit:user:100 60
 ```
 
 ### Leaderboards
+
 ```bash
 ZADD game:leaderboard score player_id
 ZREVRANGE game:leaderboard 0 9 WITHSCORES
 ```
 
 ### Real-time Analytics
+
 ```bash
 # Increment counters
 HINCRBY stats:2024-01-01 pageviews 1
@@ -337,6 +359,7 @@ ZADD time_series:temperature timestamp value
 ```
 
 ### Job Queue
+
 ```bash
 # Producer
 LPUSH queue:emails '{"to":"user@example.com","subject":"Welcome"}'

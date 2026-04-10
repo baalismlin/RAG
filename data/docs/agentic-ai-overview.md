@@ -49,13 +49,13 @@ terminates when the model emits a final answer or a maximum step limit is reache
 
 ### By Autonomy Level
 
-| Level | Name | Description |
-|---|---|---|
-| L0 | Assisted | Human approves every action |
-| L1 | Supervised | Human reviews plans before execution |
-| L2 | Semi-autonomous | Human intervenes only on failures |
-| L3 | Autonomous | Runs end-to-end, human reviews output only |
-| L4 | Continuous | Runs indefinitely, self-scheduled |
+| Level | Name            | Description                                |
+| ----- | --------------- | ------------------------------------------ |
+| L0    | Assisted        | Human approves every action                |
+| L1    | Supervised      | Human reviews plans before execution       |
+| L2    | Semi-autonomous | Human intervenes only on failures          |
+| L3    | Autonomous      | Runs end-to-end, human reviews output only |
+| L4    | Continuous      | Runs indefinitely, self-scheduled          |
 
 Most production systems in 2026 operate at L2–L3. L4 agents exist in narrow, well-monitored domains.
 
@@ -70,25 +70,26 @@ Most production systems in 2026 operate at L2–L3. L4 agents exist in narrow, w
 
 ## Key Terminology
 
-| Term | Meaning |
-|---|---|
-| **Tool / Function** | An external capability the agent can invoke (web search, code runner, DB query) |
-| **Memory** | Persisted state: in-context (conversation), external (vector DB, key-value store) |
-| **Planner** | Component that breaks a goal into an ordered sequence of subtasks |
-| **Executor** | Component that carries out individual actions |
-| **Orchestrator** | In multi-agent systems, the agent responsible for delegating to sub-agents |
-| **Guardrails** | Rules or classifiers that constrain or validate agent outputs |
-| **Handoff** | Transfer of task control from one agent to another |
-| **Interrupt** | A mechanism for a human to pause and redirect an in-progress agent |
+| Term                | Meaning                                                                           |
+| ------------------- | --------------------------------------------------------------------------------- |
+| **Tool / Function** | An external capability the agent can invoke (web search, code runner, DB query)   |
+| **Memory**          | Persisted state: in-context (conversation), external (vector DB, key-value store) |
+| **Planner**         | Component that breaks a goal into an ordered sequence of subtasks                 |
+| **Executor**        | Component that carries out individual actions                                     |
+| **Orchestrator**    | In multi-agent systems, the agent responsible for delegating to sub-agents        |
+| **Guardrails**      | Rules or classifiers that constrain or validate agent outputs                     |
+| **Handoff**         | Transfer of task control from one agent to another                                |
+| **Interrupt**       | A mechanism for a human to pause and redirect an in-progress agent                |
 
 ## Relationship to RAG
 
-RAG (Retrieval-Augmented Generation) is often a *tool* inside an agentic system, not a separate
+RAG (Retrieval-Augmented Generation) is often a _tool_ inside an agentic system, not a separate
 paradigm. An agent tasked with answering questions about a codebase will call a retrieval tool
 that performs vector search, receives relevant chunks, and incorporates them into its reasoning.
 
 Agentic RAG differs from static RAG in that the agent can:
-- Decide *when* to retrieve (not every step requires it)
+
+- Decide _when_ to retrieve (not every step requires it)
 - Reformulate queries if the first retrieval was insufficient
 - Combine retrieval with other tools (e.g. fetch docs, then run a code snippet to verify)
 

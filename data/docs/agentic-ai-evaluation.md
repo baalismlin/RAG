@@ -35,6 +35,7 @@ How many steps, tool calls, and tokens did the agent consume to reach a correct 
 A correct answer that required 20 tool calls when 5 sufficed indicates poor planning.
 
 Metrics:
+
 - `steps_to_completion`
 - `tool_calls_per_task`
 - `total_tokens_used`
@@ -49,6 +50,7 @@ Metrics:
 ### 4. Faithfulness (for RAG agents)
 
 For agents that retrieve and cite information:
+
 - Are all claims in the final answer supported by retrieved context?
 - Are citations accurate (do they point to the actual source of the claim)?
 
@@ -92,13 +94,13 @@ and scoring in 2026.
 
 Test individual components in isolation before evaluating the full agent:
 
-| Component | What to test |
-|---|---|
-| Tool definitions | Correct schema, description quality, edge case handling |
-| Planner | Given a goal, does the plan make sense? |
-| Tool executor | Given a tool call, is the result correct? |
-| Output formatter | Given context, is the final answer well-formed? |
-| Guardrails | Do classifiers correctly flag disallowed inputs/outputs? |
+| Component        | What to test                                             |
+| ---------------- | -------------------------------------------------------- |
+| Tool definitions | Correct schema, description quality, edge case handling  |
+| Planner          | Given a goal, does the plan make sense?                  |
+| Tool executor    | Given a tool call, is the result correct?                |
+| Output formatter | Given context, is the final answer well-formed?          |
+| Guardrails       | Do classifiers correctly flag disallowed inputs/outputs? |
 
 ### Regression Testing
 
@@ -109,6 +111,7 @@ might get the right answer via a worse trajectory.
 ### Adversarial / Red-Team Testing
 
 Proactively test failure modes:
+
 - **Prompt injection**: malicious content in tool results that tries to hijack the agent
 - **Jailbreaks**: user inputs designed to override the system prompt
 - **Infinite loops**: tasks designed to keep the agent searching without converging
@@ -124,6 +127,7 @@ The judge receives: the original task, the agent's final answer, and (optionally
 expected answer or retrieved context. It returns a score and a short rationale.
 
 **Judge prompt structure:**
+
 ```
 You are an impartial evaluator. Score the agent's response on a scale of 1–5.
 
@@ -140,6 +144,7 @@ Respond with JSON: {"score": <1-5>, "rationale": "<one sentence>"}
 ```
 
 **Pitfalls:**
+
 - Judge models exhibit positional bias (favor longer or first-listed answers)
 - A judge using the same base model as the agent may share the same blind spots
 - Calibrate the judge against human ratings before trusting it at scale
@@ -148,16 +153,16 @@ Respond with JSON: {"score": <1-5>, "rationale": "<one sentence>"}
 
 ## Metrics Summary
 
-| Metric | Formula / Method | Target |
-|---|---|---|
-| Task success rate | `passed / total` | > 80% for production |
-| Mean steps to completion | `sum(steps) / tasks` | Minimize; benchmark against human |
-| Tool precision | `correct_calls / total_calls` | > 90% |
-| Hallucinated tool call rate | `invalid_calls / total_calls` | < 2% |
-| Faithfulness (RAG) | LLM-judge score | > 4.0 / 5.0 |
-| Guardrail trigger rate | `blocked / total` | Monitor; sudden spikes indicate attacks |
-| P95 latency | 95th percentile trace duration | < SLA threshold |
-| Cost per task | `total_tokens × price / tasks` | Monitor vs. budget |
+| Metric                      | Formula / Method               | Target                                  |
+| --------------------------- | ------------------------------ | --------------------------------------- |
+| Task success rate           | `passed / total`               | > 80% for production                    |
+| Mean steps to completion    | `sum(steps) / tasks`           | Minimize; benchmark against human       |
+| Tool precision              | `correct_calls / total_calls`  | > 90%                                   |
+| Hallucinated tool call rate | `invalid_calls / total_calls`  | < 2%                                    |
+| Faithfulness (RAG)          | LLM-judge score                | > 4.0 / 5.0                             |
+| Guardrail trigger rate      | `blocked / total`              | Monitor; sudden spikes indicate attacks |
+| P95 latency                 | 95th percentile trace duration | < SLA threshold                         |
+| Cost per task               | `total_tokens × price / tasks` | Monitor vs. budget                      |
 
 ---
 
@@ -200,6 +205,7 @@ on every release candidate. Gate production deployments on a minimum task succes
 
 Route low-confidence agent outputs (score below threshold from automated eval) to a human
 review queue. Human feedback is used to:
+
 - Expand the evaluation dataset with new edge cases
 - Fine-tune guardrail classifiers
 - Identify which tools or prompts need improvement

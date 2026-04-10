@@ -8,17 +8,17 @@ export interface IStorage {
    * Used during incremental sync to remove stale data when a file changes or is deleted.
    * @param source - The source file path to delete data for
    */
-  deleteBySource(source: string): Promise<void>;
+  deleteBySource(source: string): Promise<void>
 
   /**
    * Delete all data from the storage.
    * This is a destructive operation that removes all data.
    */
-  deleteAll(): Promise<void>;
+  deleteAll(): Promise<void>
 
   /**
    * Get the total number of items in the storage.
    * @returns Count of stored items
    */
-  count(): Promise<number>;
+  count(): Promise<number>
 }

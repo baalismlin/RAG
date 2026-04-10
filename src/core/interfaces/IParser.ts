@@ -1,4 +1,4 @@
-import { AnyChunk, DocumentChunk, CodeChunk } from "../types/Document";
+import { AnyChunk, DocumentChunk, CodeChunk } from "../types/Document"
 
 /**
  * Base parser interface for converting raw content into chunks.
@@ -11,7 +11,7 @@ export interface IParser {
    * @param source - Source identifier (typically file path) for metadata
    * @returns Array of parsed chunks
    */
-  parse(content: string, source: string): Promise<AnyChunk[]>;
+  parse(content: string, source: string): Promise<AnyChunk[]>
 }
 
 /**
@@ -26,7 +26,7 @@ export interface IDocumentParser extends IParser {
    * @param source - Source identifier (file path)
    * @returns Array of document chunks with section metadata
    */
-  parse(content: string, source: string): Promise<DocumentChunk[]>;
+  parse(content: string, source: string): Promise<DocumentChunk[]>
 }
 
 /**
@@ -41,11 +41,11 @@ export interface ICodeParser extends IParser {
    * @param source - Source identifier (file path)
    * @returns Array of code chunks with symbol metadata
    */
-  parse(content: string, source: string): Promise<CodeChunk[]>;
+  parse(content: string, source: string): Promise<CodeChunk[]>
 
   /**
    * List of programming languages this parser supports.
    * Used to determine if the parser can handle a given code file.
    */
-  readonly supportedLanguages: string[];
+  readonly supportedLanguages: string[]
 }

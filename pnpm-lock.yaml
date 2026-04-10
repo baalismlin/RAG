@@ -96,6 +96,9 @@ importers:
       eslint-config-next:
         specifier: 14.2.5
         version: 14.2.5(eslint@8.57.1)(typescript@5.9.3)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.2(eslint@8.57.1)
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.19.39)(ts-node@10.9.2(@types/node@20.19.39)(typescript@5.9.3))
@@ -105,6 +108,9 @@ importers:
       postcss:
         specifier: ^8
         version: 8.5.8
+      prettier:
+        specifier: ^3.2.5
+        version: 3.8.2
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.19(yaml@2.8.3)
@@ -1835,6 +1841,12 @@ packages:
       typescript:
         optional: true
 
+  eslint-config-prettier@9.1.2:
+    resolution: {integrity: sha512-iI1f+D2ViGn+uvv5HuHVUamg8ll4tN+JRHGc6IJi4TP9Kl976C57fzPXgseXNs8v0iA8aSJpHsTWjDb9QJamGQ==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
+
   eslint-import-resolver-node@0.3.10:
     resolution: {integrity: sha512-tRrKqFyCaKict5hOd244sL6EQFNycnMQnBe+j8uqGNXYzsImGbGUU4ibtoaBmv5FLwJwcFJNeg1GeVjQfbMrDQ==}
 
@@ -3363,6 +3375,11 @@ packages:
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+
+  prettier@3.8.2:
+    resolution: {integrity: sha512-8c3mgTe0ASwWAJK+78dpviD+A8EqhndQPUBpNUIPt6+xWlIigCwfN01lWr9MAede4uqXGTEKeQWTvzb3vjia0Q==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   pretty-format@29.7.0:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
@@ -5714,6 +5731,10 @@ snapshots:
       - eslint-plugin-import-x
       - supports-color
 
+  eslint-config-prettier@9.1.2(eslint@8.57.1):
+    dependencies:
+      eslint: 8.57.1
+
   eslint-import-resolver-node@0.3.10:
     dependencies:
       debug: 3.2.7
@@ -6214,7 +6235,7 @@ snapshots:
       jsonwebtoken: 9.0.3
       load-esm: 1.0.3
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.14.0(debug@4.4.3))
+      retry-axios: 2.6.0(axios@1.14.0)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -7686,6 +7707,8 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
+  prettier@3.8.2: {}
+
   pretty-format@29.7.0:
     dependencies:
       '@jest/schemas': 29.6.3
@@ -7859,7 +7882,7 @@ snapshots:
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
-  retry-axios@2.6.0(axios@1.14.0(debug@4.4.3)):
+  retry-axios@2.6.0(axios@1.14.0):
     dependencies:
       axios: 1.14.0(debug@4.4.3)
 

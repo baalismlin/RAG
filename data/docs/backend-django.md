@@ -7,12 +7,15 @@ Django is a high-level Python web framework that encourages rapid development an
 ## Core Principles
 
 ### DRY (Don't Repeat Yourself)
+
 Django emphasizes code reusability and the principle of not repeating yourself.
 
 ### Convention Over Configuration
+
 Django follows conventions that reduce the number of decisions developers need to make.
 
 ### Batteries Included
+
 Comes with built-in solutions for common web development tasks.
 
 ## Project Structure
@@ -41,6 +44,7 @@ myproject/
 ## Models
 
 ### Model Definition
+
 ```python
 from django.db import models
 
@@ -55,16 +59,17 @@ class Book(models.Model):
     published_date = models.DateField()
     isbn = models.CharField(max_length=13, unique=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    
+
     class Meta:
         ordering = ['-published_date']
         db_table = 'books'
-    
+
     def __str__(self):
         return self.title
 ```
 
 ### Field Types
+
 - `CharField` - String with max length
 - `TextField` - Large text
 - `IntegerField` - Integer values
@@ -81,6 +86,7 @@ class Book(models.Model):
 ## Views
 
 ### Function-Based Views
+
 ```python
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
@@ -99,6 +105,7 @@ def api_books(request):
 ```
 
 ### Class-Based Views
+
 ```python
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -138,39 +145,39 @@ urlpatterns = [
 ## Templates
 
 ### Template Syntax
+
 ```html
 <!-- inheritance -->
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<h1>{{ book.title }}</h1>
+<p>By {{ book.author.name }}</p>
 
-{% block content %}
-  <h1>{{ book.title }}</h1>
-  <p>By {{ book.author.name }}</p>
-  
-  <!-- conditionals -->
-  {% if book.price > 20 %}
-    <span class="expensive">Premium</span>
-  {% else %}
-    <span class="affordable">Standard</span>
-  {% endif %}
-  
-  <!-- loops -->
-  {% for book in books %}
-    <div class="book">
-      <h2>{{ forloop.counter }}. {{ book.title }}</h2>
-    </div>
-  {% empty %}
-    <p>No books available.</p>
-  {% endfor %}
-  
-  <!-- filters -->
-  <p>Published: {{ book.published_date|date:"F j, Y" }}</p>
-  <p>Price: ${{ book.price|floatformat:2 }}</p>
+<!-- conditionals -->
+{% if book.price > 20 %}
+<span class="expensive">Premium</span>
+{% else %}
+<span class="affordable">Standard</span>
+{% endif %}
+
+<!-- loops -->
+{% for book in books %}
+<div class="book">
+  <h2>{{ forloop.counter }}. {{ book.title }}</h2>
+</div>
+{% empty %}
+<p>No books available.</p>
+{% endfor %}
+
+<!-- filters -->
+<p>Published: {{ book.published_date|date:"F j, Y" }}</p>
+<p>Price: ${{ book.price|floatformat:2 }}</p>
 {% endblock %}
 ```
 
 ## Forms
 
 ### Form Classes
+
 ```python
 from django import forms
 from .models import Book
@@ -219,6 +226,7 @@ class BookAdmin(admin.ModelAdmin):
 ## QuerySet API
 
 ### Basic Queries
+
 ```python
 # All records
 Book.objects.all()
@@ -244,6 +252,7 @@ Book.objects.annotate(book_count=Count('author'))
 ```
 
 ### Field Lookups
+
 - `exact` - Exact match
 - `iexact` - Case-insensitive exact
 - `contains` - Case-sensitive contains
@@ -258,6 +267,7 @@ Book.objects.annotate(book_count=Count('author'))
 ## Authentication
 
 ### Built-in Views
+
 ```python
 from django.contrib.auth import views as auth_views
 
@@ -269,6 +279,7 @@ urlpatterns = [
 ```
 
 ### Decorators
+
 ```python
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -284,18 +295,20 @@ def edit_book(request, pk):
 ## Django REST Framework
 
 ### Serializers
+
 ```python
 from rest_framework import serializers
 
 class BookSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.name', read_only=True)
-    
+
     class Meta:
         model = Book
         fields = ['id', 'title', 'author', 'author_name', 'published_date', 'price']
 ```
 
 ### ViewSets
+
 ```python
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -304,7 +317,7 @@ class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.select_related('author').all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.query_params.get('author'):
@@ -313,6 +326,7 @@ class BookViewSet(viewsets.ModelViewSet):
 ```
 
 ### Routers
+
 ```python
 from rest_framework.routers import DefaultRouter
 

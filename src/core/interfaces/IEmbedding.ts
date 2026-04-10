@@ -9,7 +9,7 @@ export interface IEmbedding {
    * @param text - Single text string to embed
    * @returns Embedding vector as an array of numbers
    */
-  embedQuery(text: string): Promise<number[]>;
+  embedQuery(text: string): Promise<number[]>
 
   /**
    * Generate embedding vectors for multiple documents.
@@ -17,5 +17,5 @@ export interface IEmbedding {
    * @param texts - Array of text strings to embed
    * @returns Array of embedding vectors, one per input text
    */
-  embedDocuments(texts: string[]): Promise<number[][]>;
+  embedDocuments(texts: string[]): Promise<number[][]>
 }

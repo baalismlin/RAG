@@ -1,25 +1,23 @@
-"use client";
+"use client"
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { ChatMessage } from "@/core/types/QueryResult";
-import { SourceCard } from "./SourceCard";
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { ChatMessage } from "@/core/types/QueryResult"
+import { SourceCard } from "./SourceCard"
 
 interface MessageBubbleProps {
-  message: ChatMessage;
+  message: ChatMessage
 }
 
 export function MessageBubble({ message }: MessageBubbleProps) {
-  const isUser = message.role === "user";
+  const isUser = message.role === "user"
 
   return (
     <div className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}>
       <div className={`flex max-w-3xl flex-col gap-2 ${isUser ? "items-end" : "items-start"}`}>
         <div
           className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
-            isUser
-              ? "bg-brand-600 text-white"
-              : "bg-white text-gray-800 border border-gray-200"
+            isUser ? "bg-brand-600 text-white" : "bg-white text-gray-800 border border-gray-200"
           }`}
         >
           {isUser ? (
@@ -29,7 +27,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               remarkPlugins={[remarkGfm]}
               components={{
                 code({ className, children, ...props }) {
-                  const isBlock = className?.startsWith("language-");
+                  const isBlock = className?.startsWith("language-")
                   return isBlock ? (
                     <pre className="my-2 overflow-auto rounded-lg bg-gray-900 p-3 text-xs text-gray-100">
                       <code className={className} {...props}>
@@ -43,7 +41,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                     >
                       {children}
                     </code>
-                  );
+                  )
                 },
               }}
             >
@@ -70,5 +68,5 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         </span>
       </div>
     </div>
-  );
+  )
 }

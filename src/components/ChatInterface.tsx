@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import { useState, useRef, useEffect, FormEvent } from "react";
-import { ChatMessage, QueryResult } from "@/core/types/QueryResult";
-import { MessageBubble } from "./MessageBubble";
+import { useState, useRef, useEffect, FormEvent } from "react"
+import { ChatMessage, QueryResult } from "@/core/types/QueryResult"
+import { MessageBubble } from "./MessageBubble"
 
 function LoadingDots() {
   return (
@@ -11,30 +11,30 @@ function LoadingDots() {
       <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:150ms]" />
       <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:300ms]" />
     </div>
-  );
+  )
 }
 
 export function ChatInterface() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [input, setInput] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, loading])
 
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const question = input.trim();
-    if (!question || loading) return;
+    e.preventDefault()
+    const question = input.trim()
+    if (!question || loading) return
 
-    const userMsg: ChatMessage = { role: "user", content: question, timestamp: new Date() };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setLoading(true);
-    setError(null);
+    const userMsg: ChatMessage = { role: "user", content: question, timestamp: new Date() }
+    setMessages((prev) => [...prev, userMsg])
+    setInput("")
+    setLoading(true)
+    setError(null)
 
     try {
       const res = await fetch("/api/chat", {
@@ -44,25 +44,25 @@ export function ChatInterface() {
           question,
           history: messages.slice(-6).map((m) => ({ role: m.role, content: m.content })),
         }),
-      });
+      })
 
       if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        throw new Error(data.error ?? `HTTP ${res.status}`);
+        const data = (await res.json()) as { error?: string }
+        throw new Error(data.error ?? `HTTP ${res.status}`)
       }
 
-      const result = (await res.json()) as QueryResult;
+      const result = (await res.json()) as QueryResult
       const assistantMsg: ChatMessage = {
         role: "assistant",
         content: result.answer,
         sources: result.sources,
         timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
+      }
+      setMessages((prev) => [...prev, assistantMsg])
     } catch (err) {
-      setError(String(err));
+      setError(String(err))
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -138,17 +138,14 @@ export function ChatInterface() {
 
       {/* Input */}
       <div className="border-t border-gray-200 bg-white px-4 py-4">
-        <form
-          onSubmit={handleSubmit}
-          className="mx-auto flex max-w-4xl items-end gap-3"
-        >
+        <form onSubmit={handleSubmit} className="mx-auto flex max-w-4xl items-end gap-3">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e as unknown as FormEvent);
+                e.preventDefault()
+                handleSubmit(e as unknown as FormEvent)
               }
             }}
             placeholder="Ask about your documents or code… (Enter to send, Shift+Enter for newline)"
@@ -157,9 +154,9 @@ export function ChatInterface() {
             disabled={loading}
             style={{ minHeight: 48, maxHeight: 200 }}
             onInput={(e) => {
-              const el = e.currentTarget;
-              el.style.height = "auto";
-              el.style.height = Math.min(el.scrollHeight, 200) + "px";
+              const el = e.currentTarget
+              el.style.height = "auto"
+              el.style.height = Math.min(el.scrollHeight, 200) + "px"
             }}
           />
           <button
@@ -168,7 +165,13 @@ export function ChatInterface() {
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Send message"
           >
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path d="M22 2L11 13" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M22 2L15 22L11 13L2 9L22 2Z" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -179,5 +182,5 @@ export function ChatInterface() {
         </p>
       </div>
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { QueryResult, ChatMessage } from "../types/QueryResult";
+import { QueryResult, ChatMessage } from "../types/QueryResult"
 
 /**
  * RAG (Retrieval-Augmented Generation) service interface.
@@ -13,5 +13,5 @@ export interface IRAGService {
    * @param history - Optional conversation history for multi-turn conversations
    * @returns Query result containing the answer, retrieved chunks, and metadata
    */
-  query(question: string, history?: ChatMessage[]): Promise<QueryResult>;
+  query(question: string, history?: ChatMessage[]): Promise<QueryResult>
 }

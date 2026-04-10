@@ -7,23 +7,29 @@ MySQL is the world's most popular open-source relational database management sys
 ## Key Features
 
 ### ACID Compliance
+
 Full ACID compliance with InnoDB storage engine for reliable transaction processing.
 
 ### Replication
+
 Multiple replication options including asynchronous, semi-synchronous, and group replication.
 
 ### Partitioning
+
 Support for horizontal partitioning of large tables.
 
 ### JSON Support
+
 Native JSON data type and functions for handling semi-structured data.
 
 ### High Availability
+
 Group Replication, InnoDB Cluster, and automated failover capabilities.
 
 ## Basic Operations
 
 ### Creating Databases and Tables
+
 ```sql
 -- Create database
 CREATE DATABASE myapp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -59,6 +65,7 @@ CREATE TABLE posts (
 ```
 
 ### CRUD Operations
+
 ```sql
 -- Insert
 INSERT INTO users (email, password_hash, first_name, last_name)
@@ -75,7 +82,7 @@ SELECT DISTINCT status FROM posts;
 
 -- Update
 UPDATE users SET first_name = 'Johnny' WHERE id = 1;
-UPDATE posts SET status = 'published', published_at = NOW() 
+UPDATE posts SET status = 'published', published_at = NOW()
 WHERE id = 5 AND status = 'draft';
 
 -- Delete
@@ -85,6 +92,7 @@ DELETE FROM posts WHERE status = 'archived' AND created_at < DATE_SUB(NOW(), INT
 ## Advanced Queries
 
 ### Joins
+
 ```sql
 -- Inner join
 SELECT u.email, p.title, p.status
@@ -106,13 +114,14 @@ LEFT JOIN comments c ON p.id = c.post_id;
 ```
 
 ### Subqueries
+
 ```sql
 -- Subquery in WHERE
-SELECT * FROM users 
+SELECT * FROM users
 WHERE id IN (SELECT DISTINCT user_id FROM posts WHERE status = 'published');
 
 -- Correlated subquery
-SELECT u.*, 
+SELECT u.*,
     (SELECT COUNT(*) FROM posts WHERE user_id = u.id) AS post_count
 FROM users u;
 
@@ -128,9 +137,10 @@ WHERE post_count > 5;
 ```
 
 ### Window Functions
+
 ```sql
 -- Row numbering and ranking
-SELECT 
+SELECT
     email,
     created_at,
     ROW_NUMBER() OVER (ORDER BY created_at) AS row_num,
@@ -144,7 +154,7 @@ FROM (
 ) AS user_stats;
 
 -- Running totals
-SELECT 
+SELECT
     id,
     amount,
     SUM(amount) OVER (ORDER BY created_at) AS running_total,
@@ -166,7 +176,7 @@ INSERT INTO configs (settings) VALUES
 ('{"theme": "dark", "notifications": true, "language": "en"}');
 
 -- Extract JSON values
-SELECT 
+SELECT
     id,
     JSON_UNQUOTE(JSON_EXTRACT(settings, '$.theme')) AS theme,
     settings->>'$.language' AS language,
@@ -174,7 +184,7 @@ SELECT
 FROM configs;
 
 -- Update JSON
-UPDATE configs 
+UPDATE configs
 SET settings = JSON_SET(settings, '$.theme', 'light');
 
 -- Search JSON
@@ -185,7 +195,7 @@ SELECT * FROM configs WHERE JSON_SEARCH(settings, 'one', 'en') IS NOT NULL;
 UPDATE configs SET settings = JSON_REMOVE(settings, '$.temp_key');
 
 -- Merge JSON
-UPDATE configs 
+UPDATE configs
 SET settings = JSON_MERGE_PATCH(settings, '{"new_key": "value"}');
 ```
 
@@ -229,7 +239,7 @@ OPTIMIZE TABLE posts;
 DELIMITER //
 CREATE PROCEDURE GetUserPosts(IN userId INT)
 BEGIN
-    SELECT p.*, u.email 
+    SELECT p.*, u.email
     FROM posts p
     JOIN users u ON p.user_id = u.id
     WHERE p.user_id = userId;
@@ -263,7 +273,7 @@ DROP FUNCTION IF EXISTS GetPostCount;
 ```sql
 -- Before update trigger
 DELIMITER //
-CREATE TRIGGER before_user_update 
+CREATE TRIGGER before_user_update
 BEFORE UPDATE ON users
 FOR EACH ROW
 BEGIN
@@ -325,9 +335,9 @@ WITH RECURSIVE subordinates AS (
     -- Anchor member: top-level employees
     SELECT id, name, manager_id, 0 AS level
     FROM employees WHERE manager_id IS NULL
-    
+
     UNION ALL
-    
+
     -- Recursive member: employees with managers
     SELECT e.id, e.name, e.manager_id, s.level + 1
     FROM employees e
@@ -339,11 +349,13 @@ SELECT * FROM subordinates;
 ## Replication
 
 ### Types
+
 - **Asynchronous**: Primary doesn't wait for replicas
 - **Semi-synchronous**: Primary waits for at least one replica
 - **Group Replication**: Multi-primary, consensus-based
 
 ### Configuration
+
 ```ini
 # Primary (my.cnf)
 server-id=1
@@ -393,14 +405,17 @@ CREATE TABLE sessions (
 ## Performance Features
 
 ### Query Cache (removed in 8.0)
+
 Replaced with other caching strategies in MySQL 8.0
 
 ### Buffer Pool
+
 ```ini
 innodb_buffer_pool_size = 4G  # Typically 70-80% of RAM
 ```
 
 ### Query Optimization
+
 ```sql
 -- Explain query
 EXPLAIN ANALYZE SELECT * FROM posts WHERE user_id = 1;

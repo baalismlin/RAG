@@ -7,9 +7,11 @@ Flask is a lightweight WSGI web application framework in Python. It is designed 
 ## Core Philosophy
 
 ### Microframework
+
 Flask keeps the core simple but extensible. It doesn't enforce a specific structure or require dependencies beyond the core.
 
 ### Flexibility
+
 Flask allows developers to choose their own tools and libraries for database integration, authentication, and other functionality.
 
 ## Basic Application
@@ -39,6 +41,7 @@ if __name__ == '__main__':
 ## Routing
 
 ### Dynamic Routes
+
 ```python
 @app.route('/users/<username>')
 def show_user(username):
@@ -54,6 +57,7 @@ def show_subpath(subpath):
 ```
 
 ### URL Building
+
 ```python
 from flask import url_for
 
@@ -63,6 +67,7 @@ def index():
 ```
 
 ### HTTP Methods
+
 ```python
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -75,6 +80,7 @@ def login():
 ## Request Handling
 
 ### Request Object
+
 ```python
 from flask import request
 
@@ -82,25 +88,26 @@ from flask import request
 def upload():
     # Form data
     username = request.form.get('username')
-    
+
     # Query parameters
     page = request.args.get('page', 1, type=int)
-    
+
     # JSON data
     data = request.get_json()
-    
+
     # Files
     file = request.files['file']
-    
+
     # Headers
     auth = request.headers.get('Authorization')
-    
+
     return jsonify({'success': True})
 ```
 
 ## Responses
 
 ### JSON Responses
+
 ```python
 from flask import jsonify
 
@@ -115,6 +122,7 @@ def users():
 ```
 
 ### Custom Responses
+
 ```python
 from flask import make_response
 
@@ -128,6 +136,7 @@ def custom_response():
 ## Templates (Jinja2)
 
 ### Basic Templates
+
 ```python
 from flask import render_template
 
@@ -140,28 +149,29 @@ def hello(name):
 <!-- templates/hello.html -->
 <!DOCTYPE html>
 <html>
-<head><title>Hello</title></head>
-<body>
+  <head>
+    <title>Hello</title>
+  </head>
+  <body>
     <h1>Hello, {{ name }}!</h1>
-    
+
     {% if users %}
-        <ul>
-        {% for user in users %}
-            <li>{{ user.name }} ({{ user.email }})</li>
-        {% endfor %}
-        </ul>
+    <ul>
+      {% for user in users %}
+      <li>{{ user.name }} ({{ user.email }})</li>
+      {% endfor %}
+    </ul>
     {% else %}
-        <p>No users found.</p>
+    <p>No users found.</p>
     {% endif %}
-</body>
+  </body>
 </html>
 ```
 
 ### Template Filters
+
 ```html
-{{ name|upper }}
-{{ description|truncate(100) }}
-{{ date|datetimeformat('%Y-%m-%d') }}
+{{ name|upper }} {{ description|truncate(100) }} {{ date|datetimeformat('%Y-%m-%d') }}
 ```
 
 ## Sessions
@@ -198,6 +208,7 @@ def internal_error(error):
 ## Blueprints
 
 Organize applications into components:
+
 ```python
 from flask import Blueprint
 
@@ -232,6 +243,7 @@ app.config.from_object('config.ProductionConfig')
 ## Extensions
 
 ### Flask-SQLAlchemy
+
 ```python
 from flask_sqlalchemy import SQLAlchemy
 
@@ -250,6 +262,7 @@ def users():
 ```
 
 ### Flask-Login
+
 ```python
 from flask_login import LoginManager, login_required, current_user
 
@@ -266,6 +279,7 @@ def protected():
 ```
 
 ### Flask-WTF (Forms)
+
 ```python
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
@@ -286,6 +300,7 @@ def login():
 ```
 
 ### Flask-Migrate
+
 ```python
 from flask_migrate import Migrate
 
@@ -293,11 +308,13 @@ migrate = Migrate(app, db)
 ```
 
 Commands:
+
 - `flask db init` - Initialize migrations
 - `flask db migrate` - Create migration
 - `flask db upgrade` - Apply migrations
 
 ### Flask-CORS
+
 ```python
 from flask_cors import CORS
 
@@ -314,18 +331,18 @@ api = Api(app)
 class UserResource(Resource):
     def get(self, user_id):
         return {'user': user_id}
-    
+
     def put(self, user_id):
         data = request.get_json()
         return {'user': user_id, 'updated': data}
-    
+
     def delete(self, user_id):
         return {'message': 'User deleted'}
 
 class UserListResource(Resource):
     def get(self):
         return {'users': []}
-    
+
     def post(self):
         data = request.get_json()
         return {'user': data}, 201
@@ -363,6 +380,7 @@ def init_db():
 ```
 
 Run with:
+
 ```bash
 flask init-db
 ```

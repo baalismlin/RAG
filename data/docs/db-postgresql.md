@@ -7,9 +7,11 @@ PostgreSQL is a powerful, open-source object-relational database system with ove
 ## Key Features
 
 ### ACID Compliance
+
 PostgreSQL ensures full ACID (Atomicity, Consistency, Isolation, Durability) compliance for reliable transaction processing.
 
 ### Extensibility
+
 - Custom data types
 - Custom functions
 - Custom operators
@@ -18,6 +20,7 @@ PostgreSQL ensures full ACID (Atomicity, Consistency, Isolation, Durability) com
 - Custom extensions
 
 ### Advanced Data Types
+
 - Arrays
 - JSON/JSONB
 - XML
@@ -31,6 +34,7 @@ PostgreSQL ensures full ACID (Atomicity, Consistency, Isolation, Durability) com
 ## Basic Operations
 
 ### Creating Databases and Tables
+
 ```sql
 -- Create database
 CREATE DATABASE myapp;
@@ -62,6 +66,7 @@ CREATE TABLE posts (
 ```
 
 ### CRUD Operations
+
 ```sql
 -- Insert
 INSERT INTO users (email, password_hash, first_name, last_name)
@@ -73,7 +78,7 @@ SELECT * FROM users WHERE email LIKE '%@example.com';
 SELECT id, email, first_name || ' ' || last_name AS full_name FROM users;
 
 -- Update
-UPDATE users 
+UPDATE users
 SET profile_data = '{"theme": "dark"}', updated_at = NOW()
 WHERE id = 1;
 
@@ -84,6 +89,7 @@ DELETE FROM users WHERE created_at < NOW() - INTERVAL '1 year';
 ## Advanced Queries
 
 ### Joins
+
 ```sql
 -- Inner join
 SELECT u.email, p.title
@@ -101,24 +107,25 @@ GROUP BY u.id, u.email;
 SELECT u.email, recent_posts.title
 FROM users u
 LEFT JOIN LATERAL (
-    SELECT title FROM posts 
-    WHERE user_id = u.id 
-    ORDER BY created_at DESC 
+    SELECT title FROM posts
+    WHERE user_id = u.id
+    ORDER BY created_at DESC
     LIMIT 3
 ) recent_posts ON true;
 ```
 
 ### Window Functions
+
 ```sql
 -- Row numbering
-SELECT 
+SELECT
     email,
     created_at,
     ROW_NUMBER() OVER (ORDER BY created_at) as row_num
 FROM users;
 
 -- Running totals
-SELECT 
+SELECT
     user_id,
     title,
     created_at,
@@ -126,7 +133,7 @@ SELECT
 FROM posts;
 
 -- Ranking
-SELECT 
+SELECT
     user_id,
     COUNT(*) as post_count,
     RANK() OVER (ORDER BY COUNT(*) DESC) as rank
@@ -135,9 +142,10 @@ GROUP BY user_id;
 ```
 
 ### Common Table Expressions (CTEs)
+
 ```sql
 WITH user_stats AS (
-    SELECT 
+    SELECT
         user_id,
         COUNT(*) as post_count,
         MAX(created_at) as last_post_date
@@ -158,11 +166,11 @@ INSERT INTO users (email, profile_data)
 VALUES ('jane@example.com', '{"preferences": {"theme": "light", "notifications": true}}');
 
 -- Query JSON
-SELECT * FROM users 
+SELECT * FROM users
 WHERE profile_data @> '{"preferences": {"theme": "dark"}}';
 
 -- Extract JSON values
-SELECT 
+SELECT
     email,
     profile_data->>'name' as name,
     profile_data->'preferences'->>'theme' as theme
@@ -171,14 +179,14 @@ FROM users;
 -- Update JSON
 UPDATE users
 SET profile_data = jsonb_set(
-    profile_data, 
-    '{preferences,theme}', 
+    profile_data,
+    '{preferences,theme}',
     '"dark"'
 )
 WHERE id = 1;
 
 -- JSON aggregation
-SELECT 
+SELECT
     user_id,
     jsonb_agg(jsonb_build_object('title', title, 'date', created_at)) as posts
 FROM posts
@@ -188,6 +196,7 @@ GROUP BY user_id;
 ## Indexing
 
 ### Index Types
+
 ```sql
 -- B-tree index (default)
 CREATE INDEX idx_users_email ON users(email);
@@ -221,7 +230,7 @@ CREATE INDEX idx_users_covering ON users(email) INCLUDE (first_name, last_name);
 -- Create search vector
 ALTER TABLE posts ADD COLUMN search_vector tsvector;
 
-UPDATE posts SET search_vector = 
+UPDATE posts SET search_vector =
     setweight(to_tsvector('english', COALESCE(title, '')), 'A') ||
     setweight(to_tsvector('english', COALESCE(content, '')), 'B');
 
@@ -254,7 +263,7 @@ CREATE TRIGGER update_users_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Generated column
-ALTER TABLE posts ADD COLUMN title_lower VARCHAR(200) 
+ALTER TABLE posts ADD COLUMN title_lower VARCHAR(200)
     GENERATED ALWAYS AS (LOWER(title)) STORED;
 ```
 
@@ -269,7 +278,7 @@ WHERE active = true;
 
 -- Materialized view
 CREATE MATERIALIZED VIEW monthly_stats AS
-SELECT 
+SELECT
     DATE_TRUNC('month', created_at) as month,
     COUNT(*) as new_users
 FROM users
@@ -300,6 +309,7 @@ CREATE TABLE events_2024_02 PARTITION OF events
 ## Performance Features
 
 ### Query Planning
+
 ```sql
 -- Explain query plan
 EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
@@ -310,16 +320,19 @@ VACUUM ANALYZE users;
 ```
 
 ### Parallel Query
+
 - Parallel sequential scans
 - Parallel joins
 - Parallel aggregation
 
 ### Connection Pooling
+
 Commonly used with PgBouncer for high-concurrency scenarios.
 
 ## Extensions
 
 Popular extensions:
+
 - **PostGIS**: Geographic objects support
 - **pg_trgm**: Trigram matching for fuzzy search
 - **uuid-ossp**: UUID generation

@@ -87,12 +87,12 @@ agent framework can speak.
 
 ### MCP Primitives
 
-| Primitive | Description |
-|---|---|
-| **Tools** | Callable functions the agent can invoke (e.g. `read_file`, `run_query`) |
+| Primitive     | Description                                                             |
+| ------------- | ----------------------------------------------------------------------- |
+| **Tools**     | Callable functions the agent can invoke (e.g. `read_file`, `run_query`) |
 | **Resources** | Static or dynamic data the agent can read (e.g. file contents, DB rows) |
-| **Prompts** | Reusable prompt templates the server exposes to the agent |
-| **Sampling** | Allows MCP servers to request LLM completions from the host |
+| **Prompts**   | Reusable prompt templates the server exposes to the agent               |
+| **Sampling**  | Allows MCP servers to request LLM completions from the host             |
 
 ### Why MCP Matters
 
@@ -150,22 +150,26 @@ async def main():
 ## Common Tool Categories
 
 ### Information Retrieval
+
 - **Web search**: Brave Search, Tavily, Exa — returns web results with snippets
 - **Vector search**: queries an embedding index (the RAG tool pattern)
 - **Database query**: executes parameterized SQL against a relational DB
 - **Document reader**: fetches and parses PDFs, Word docs, web pages
 
 ### Code Execution
+
 - **Code interpreter**: runs Python in a sandboxed environment, returns stdout/stderr
 - **Shell executor**: runs shell commands (high risk — requires strict guardrails)
 - **REPL**: interactive evaluation for exploratory data analysis tasks
 
 ### External Services
+
 - **Email / calendar**: send messages, create events (irreversible — always requires L2+ approval)
 - **Version control**: read/write files, create PRs, comment on issues
 - **Cloud infrastructure**: provision resources, query logs, scale services
 
 ### Internal Business Systems
+
 - **CRM / ticketing**: read/create/update customer records and support tickets
 - **ERP / HR**: query organizational data, submit forms
 - **Internal wikis**: fetch documentation from Confluence, Notion, SharePoint
@@ -196,7 +200,7 @@ The model parses natural language poorly when it appears inside a tool result.
 ### Fail Loudly
 
 Tools should raise exceptions with descriptive error messages on failure rather than returning
-`null` or empty arrays silently. The model needs to know *why* a tool failed to decide whether
+`null` or empty arrays silently. The model needs to know _why_ a tool failed to decide whether
 to retry, try a different tool, or ask the user.
 
 ### Idempotency Where Possible
