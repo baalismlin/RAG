@@ -1,7 +1,7 @@
 import { IGraphStore } from "@/core/interfaces/IGraphStore";
 import { SymbolRelation, RelationType, TraversalNode } from "@/core/types/CodeKnowledge";
-import { getPool } from "./PostgresClient";
-import { SymbolStore } from "./SymbolStore";
+import { getPool } from "@/storage/relational/PostgresClient";
+import { SymbolStore } from "@/storage/relational/SymbolStore";
 
 export class GraphStore implements IGraphStore {
   private readonly symbolStore: SymbolStore;
@@ -82,8 +82,17 @@ export class GraphStore implements IGraphStore {
     await getPool().query("DELETE FROM symbol_relations WHERE file_path = $1", [filePath]);
   }
 
+  async deleteBySource(source: string): Promise<void> {
+    await this.deleteByFile(source);
+  }
+
   async deleteAll(): Promise<void> {
     await getPool().query("DELETE FROM symbol_relations");
+  }
+
+  async count(): Promise<number> {
+    const { rows } = await getPool().query("SELECT COUNT(*) as count FROM symbol_relations");
+    return Number(rows[0]?.count ?? 0);
   }
 
   private rowToRelation(row: Record<string, unknown>): SymbolRelation {

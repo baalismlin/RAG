@@ -1,7 +1,6 @@
 import Parser from "tree-sitter";
 import { ILanguageStrategy, SymbolInfo } from "./ILanguageStrategy";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const PyGrammar = require("tree-sitter-python");
 
 const PY_QUERY = `

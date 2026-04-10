@@ -4,10 +4,10 @@ import { IEmbedding } from "@/core/interfaces/IEmbedding";
 import { AnyChunk } from "@/core/types/Document";
 import { RetrievedChunk } from "@/core/types/QueryResult";
 
-const DEFAULT_COLLECTION = process.env.CHROMA_CODE_COLLECTION ?? "rag_code";
+const DEFAULT_COLLECTION = process.env.CHROMA_DOC_COLLECTION ?? "rag_documents";
 const DEFAULT_CHROMA_URL = process.env.CHROMA_URL ?? "http://localhost:8000";
 
-export class ChromaCodeStore implements IVectorStore {
+export class ChromaDocumentStore implements IVectorStore {
   private readonly client: ChromaClient;
   private collection: Collection | null = null;
   private readonly collectionName: string;
@@ -61,7 +61,7 @@ export class ChromaCodeStore implements IVectorStore {
           metadata: metadatas[i] as unknown as AnyChunk["metadata"],
         },
         score: 1 - (distances[i] ?? 0),
-        storeType: "code",
+        storeType: "document",
       });
     }
 
@@ -73,9 +73,17 @@ export class ChromaCodeStore implements IVectorStore {
     this.collection = null;
   }
 
+  async deleteAll(): Promise<void> {
+    await this.deleteCollection();
+  }
+
   async deleteChunksBySource(source: string): Promise<void> {
     const collection = await this.getCollection();
     await collection.delete({ where: { source } });
+  }
+
+  async deleteBySource(source: string): Promise<void> {
+    await this.deleteChunksBySource(source);
   }
 
   async count(): Promise<number> {

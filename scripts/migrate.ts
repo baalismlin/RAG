@@ -4,10 +4,10 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
 
-import { getPool, closePool } from "../src/db/PostgresClient";
+import { getPool, closePool } from "../src/storage/relational/PostgresClient";
 
 async function main() {
-  const schemaPath = path.resolve(__dirname, "../src/db/schema.sql");
+  const schemaPath = path.resolve(__dirname, "../src/storage/relational/schema.sql");
   const sql = await fs.readFile(schemaPath, "utf-8");
   const pool = getPool();
 

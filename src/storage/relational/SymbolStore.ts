@@ -1,6 +1,6 @@
 import { ISymbolStore, SymbolLookupOptions } from "@/core/interfaces/ISymbolStore";
 import { CodeSymbol } from "@/core/types/CodeKnowledge";
-import { getPool } from "./PostgresClient";
+import { getPool } from "@/storage/relational/PostgresClient";
 
 export class SymbolStore implements ISymbolStore {
   async upsertSymbols(symbols: CodeSymbol[]): Promise<void> {
@@ -58,8 +58,17 @@ export class SymbolStore implements ISymbolStore {
     await getPool().query("DELETE FROM symbols WHERE file_path = $1", [filePath]);
   }
 
+  async deleteBySource(source: string): Promise<void> {
+    await this.deleteByFile(source);
+  }
+
   async deleteAll(): Promise<void> {
     await getPool().query("DELETE FROM symbols");
+  }
+
+  async count(): Promise<number> {
+    const { rows } = await getPool().query("SELECT COUNT(*) as count FROM symbols");
+    return Number(rows[0]?.count ?? 0);
   }
 
   private rowToSymbol(row: Record<string, unknown>): CodeSymbol {

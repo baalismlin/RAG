@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const targetPath = body.path ?? process.env.DATA_DOCS_PATH ?? "./data";
 
     const indexer = getIndexingService();
-    const result = await indexer.indexDirectory(targetPath);
+    const result = await indexer.syncDirectory(targetPath);
 
     return NextResponse.json(result);
   } catch (err) {

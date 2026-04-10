@@ -1,18 +1,9 @@
 import * as fs from "fs/promises";
 import * as path from "path";
-import { IVectorStore } from "@/core/interfaces/IVectorStore";
+import { IContentStore } from "@/core/interfaces/IContentStore";
+import { IndexingResult, SyncResult } from "@/core/interfaces/IIndexing";
 import { LoaderFactory } from "@/loaders/LoaderFactory";
 import { AnyChunk, isCodeChunk } from "@/core/types/Document";
-import { CodeKnowledgeStore } from "@/code/CodeKnowledgeStore";
-import { RelationExtractor } from "@/ast/RelationExtractor";
-
-export interface IndexingResult {
-  totalFiles: number;
-  totalChunks: number;
-  docChunks: number;
-  codeChunks: number;
-  errors: string[];
-}
 
 interface ManifestEntry {
   mtime: number;
@@ -24,111 +15,16 @@ interface FileManifest {
   lastSync: string;
 }
 
-export interface SyncResult extends IndexingResult {
-  added: number;
-  updated: number;
-  removed: number;
-  unchanged: number;
-}
-
 export class IndexingService {
-  private readonly docStore: IVectorStore;
-  private readonly codeStore: IVectorStore;
-  private readonly codeKnowledge?: CodeKnowledgeStore;
-  private readonly relationExtractor = new RelationExtractor();
+  private readonly docStore: IContentStore;
+  private readonly codeStore: IContentStore;
 
-  constructor(docStore: IVectorStore, codeStore: IVectorStore, codeKnowledge?: CodeKnowledgeStore) {
+  constructor(docStore: IContentStore, codeStore: IContentStore) {
     this.docStore = docStore;
     this.codeStore = codeStore;
-    this.codeKnowledge = codeKnowledge;
   }
 
-  async indexDirectory(dirPath: string): Promise<IndexingResult> {
-    const result: IndexingResult = { totalFiles: 0, totalChunks: 0, docChunks: 0, codeChunks: 0, errors: [] };
-    const files = await this.collectFiles(dirPath);
-
-    const docChunks: AnyChunk[] = [];
-    const codeChunks: AnyChunk[] = [];
-
-    for (const file of files) {
-      const loader = LoaderFactory.getLoader(file);
-      if (!loader) continue;
-
-      try {
-        const chunks = await loader.load(file);
-        result.totalFiles++;
-
-        for (const chunk of chunks) {
-          if (isCodeChunk(chunk)) {
-            codeChunks.push(chunk);
-          } else {
-            docChunks.push(chunk);
-          }
-        }
-
-        if (this.codeKnowledge && chunks.some(isCodeChunk)) {
-          await this.indexCodeKnowledge(file, chunks.filter(isCodeChunk));
-        }
-      } catch (err) {
-        result.errors.push(`Failed to load ${file}: ${String(err)}`);
-      }
-    }
-
-    if (docChunks.length > 0) {
-      await this.docStore.addChunks(docChunks);
-      result.docChunks = docChunks.length;
-    }
-
-    if (codeChunks.length > 0) {
-      await this.codeStore.addChunks(codeChunks);
-      result.codeChunks = codeChunks.length;
-    }
-
-    result.totalChunks = result.docChunks + result.codeChunks;
-    return result;
-  }
-
-  async indexFile(filePath: string): Promise<IndexingResult> {
-    const result: IndexingResult = { totalFiles: 0, totalChunks: 0, docChunks: 0, codeChunks: 0, errors: [] };
-    const loader = LoaderFactory.getLoader(filePath);
-    if (!loader) {
-      result.errors.push(`No loader for ${filePath}`);
-      return result;
-    }
-
-    try {
-      const chunks = await loader.load(filePath);
-      result.totalFiles = 1;
-
-      const docChunks = chunks.filter((c) => !isCodeChunk(c));
-      const codeChunks = chunks.filter(isCodeChunk);
-
-      if (docChunks.length > 0) await this.docStore.addChunks(docChunks);
-      if (codeChunks.length > 0) {
-        await this.codeStore.addChunks(codeChunks);
-        if (this.codeKnowledge) {
-          await this.indexCodeKnowledge(filePath, codeChunks);
-        }
-      }
-
-      result.docChunks = docChunks.length;
-      result.codeChunks = codeChunks.length;
-      result.totalChunks = chunks.length;
-    } catch (err) {
-      result.errors.push(`Failed to index ${filePath}: ${String(err)}`);
-    }
-
-    return result;
-  }
-
-  private async indexCodeKnowledge(filePath: string, _chunks: AnyChunk[]): Promise<void> {
-    const content = await fs.readFile(filePath, "utf-8").catch(() => "");
-    if (!content || !this.codeKnowledge) return;
-    const { symbols, relations } = this.relationExtractor.extract(content, filePath);
-    await this.codeKnowledge.indexCodeFile(_chunks, symbols, relations);
-  }
-
-  async syncDirectory(dirPath: string, manifestPath?: string): Promise<SyncResult> {
+   async syncDirectory(dirPath: string, manifestPath?: string): Promise<SyncResult> {
     const resolvedManifest = manifestPath ?? path.join(dirPath, ".index-manifest.json");
     const manifest = await this.loadManifest(resolvedManifest);
 
@@ -145,9 +41,8 @@ export class IndexingService {
     for (const trackedPath of Object.keys(manifest.files)) {
       if (!currentSet.has(trackedPath)) {
         try {
-          await this.docStore.deleteChunksBySource(trackedPath);
-          await this.codeStore.deleteChunksBySource(trackedPath);
-          await this.codeKnowledge?.deleteByFile(trackedPath);
+          await this.docStore.deleteBySource(trackedPath);
+          await this.codeStore.deleteBySource(trackedPath);
           delete manifest.files[trackedPath];
           result.removed++;
         } catch (err) {
@@ -177,11 +72,11 @@ export class IndexingService {
 
       if (!isNew) {
         try {
-          await this.docStore.deleteChunksBySource(filePath);
-          await this.codeStore.deleteChunksBySource(filePath);
-          await this.codeKnowledge?.deleteByFile(filePath);
+          await this.docStore.deleteBySource(filePath);
+          await this.codeStore.deleteBySource(filePath);
         } catch (err) {
           result.errors.push(`Failed to clear old chunks for ${filePath}: ${String(err)}`);
+          // Skip indexing if deletion fails to avoid inconsistent state
           continue;
         }
       }
@@ -193,6 +88,7 @@ export class IndexingService {
       result.totalChunks += fileResult.totalChunks;
       result.errors.push(...fileResult.errors);
 
+      // Only update manifest if indexing succeeded without errors
       if (fileResult.errors.length === 0) {
         manifest.files[filePath] = stat;
         if (isNew) result.added++;
@@ -202,6 +98,36 @@ export class IndexingService {
 
     manifest.lastSync = new Date().toISOString();
     await this.saveManifest(resolvedManifest, manifest);
+
+    return result;
+  }
+
+  private async indexFile(filePath: string): Promise<IndexingResult> {
+    const result: IndexingResult = { totalFiles: 0, totalChunks: 0, docChunks: 0, codeChunks: 0, errors: [] };
+    const loader = LoaderFactory.getLoader(filePath);
+    if (!loader) {
+      result.errors.push(`No loader for ${filePath}`);
+      return result;
+    }
+
+    try {
+      const chunks = await loader.load(filePath);
+      result.totalFiles = 1;
+
+      const docChunks = chunks.filter((c) => !isCodeChunk(c));
+      const codeChunks = chunks.filter(isCodeChunk);
+
+      if (docChunks.length > 0) await this.docStore.indexFile(filePath, docChunks);
+      if (codeChunks.length > 0) {
+        await this.codeStore.indexFile(filePath, codeChunks);
+      }
+
+      result.docChunks = docChunks.length;
+      result.codeChunks = codeChunks.length;
+      result.totalChunks = chunks.length;
+    } catch (err) {
+      result.errors.push(`Failed to index ${filePath}: ${String(err)}`);
+    }
 
     return result;
   }

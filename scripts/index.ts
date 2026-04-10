@@ -4,7 +4,11 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
 
 import { EmbeddingFactory } from "../src/embeddings/EmbeddingFactory";
-import { VectorStoreFactory } from "../src/vectorstore/VectorStoreFactory";
+import { VectorStoreFactory } from "../src/storage/vector/VectorStoreFactory";
+import { DocumentStore } from "../src/storage/DocumentStore";
+import { CodeKnowledgeStore } from "../src/storage/CodeKnowledgeStore";
+import { SymbolStore } from "../src/storage/relational/SymbolStore";
+import { GraphStore } from "../src/storage/relational/GraphStore";
 import { IndexingService } from "../src/indexer/IndexingService";
 
 async function main() {
@@ -17,13 +21,18 @@ async function main() {
 
   console.log("🔧 Initializing embedding and vector stores...");
   const embedding = EmbeddingFactory.create("ollama");
-  const docStore = VectorStoreFactory.createDocumentStore(embedding);
-  const codeStore = VectorStoreFactory.createCodeStore(embedding);
+  const docVectorStore = VectorStoreFactory.createDocumentStore(embedding);
+  const codeVectorStore = VectorStoreFactory.createCodeStore(embedding);
+  const symbolStore = new SymbolStore();
+  const graphStore = new GraphStore(symbolStore);
+
+  const docStore = new DocumentStore(docVectorStore);
+  const codeStore = new CodeKnowledgeStore(codeVectorStore, symbolStore, graphStore);
 
   if (reset) {
     console.log("🗑️  Resetting collections...");
-    await docStore.deleteCollection();
-    await codeStore.deleteCollection();
+    await docStore.deleteAll();
+    await codeStore.deleteAll();
     console.log("   Collections cleared.");
   }
 
@@ -56,10 +65,10 @@ async function main() {
   }
 
   console.log(`📄 Indexing documents from: ${docsPath}`);
-  const docResult = await indexer.indexDirectory(path.resolve(docsPath));
+  const docResult = await indexer.syncDirectory(path.resolve(docsPath));
 
   console.log(`💻 Indexing code from: ${codePath}`);
-  const codeResult = await indexer.indexDirectory(path.resolve(codePath));
+  const codeResult = await indexer.syncDirectory(path.resolve(codePath));
 
   const totalFiles = docResult.totalFiles + codeResult.totalFiles;
   const totalChunks = docResult.totalChunks + codeResult.totalChunks;

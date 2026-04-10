@@ -1,3 +1,4 @@
+import { IStorage } from "./IStorage";
 import { CodeSymbol, SymbolKind } from "../types/CodeKnowledge";
 
 export interface SymbolLookupOptions {
@@ -8,10 +9,9 @@ export interface SymbolLookupOptions {
   exactMatch?: boolean;
 }
 
-export interface ISymbolStore {
+export interface ISymbolStore extends IStorage {
   upsertSymbols(symbols: CodeSymbol[]): Promise<void>;
   lookup(options: SymbolLookupOptions): Promise<CodeSymbol[]>;
   getById(id: string): Promise<CodeSymbol | null>;
   deleteByFile(filePath: string): Promise<void>;
-  deleteAll(): Promise<void>;
 }

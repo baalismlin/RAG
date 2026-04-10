@@ -1,3 +1,4 @@
+import { IStorage } from "./IStorage";
 import { AnyChunk } from "../types/Document";
 import { RetrievedChunk } from "../types/QueryResult";
 
@@ -5,7 +6,7 @@ import { RetrievedChunk } from "../types/QueryResult";
  * Vector store interface for managing document/code embeddings.
  * Provides methods for adding, searching, and deleting chunks in a vector database.
  */
-export interface IVectorStore {
+export interface IVectorStore extends IStorage {
   /**
    * Add or update chunks in the vector store.
    * Uses upsert semantics — existing chunks with matching IDs are replaced.
@@ -33,10 +34,4 @@ export interface IVectorStore {
    * @param source - The source file path to delete chunks for
    */
   deleteChunksBySource(source: string): Promise<void>;
-
-  /**
-   * Get the total number of chunks in the collection.
-   * @returns Count of stored chunks
-   */
-  count(): Promise<number>;
 }

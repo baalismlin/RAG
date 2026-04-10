@@ -1,9 +1,7 @@
 import Parser from "tree-sitter";
 import { ILanguageStrategy, SymbolInfo } from "./ILanguageStrategy";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const TSGrammar = require("tree-sitter-typescript");
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const JSGrammar = require("tree-sitter-javascript");
 
 const TS_QUERY = `
