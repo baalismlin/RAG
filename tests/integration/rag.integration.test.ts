@@ -10,6 +10,30 @@ import { QueryClassifier } from "@/rag/QueryClassifier";
 import { HybridRetriever } from "@/retrievers/HybridRetriever";
 import { IRetriever } from "@/core/interfaces/IRetriever";
 import { RetrievedChunk } from "@/core/types/QueryResult";
+import { LanguageRegistry } from "@/parsers/languages/LanguageRegistry";
+import { ILanguageStrategy, SymbolInfo } from "@/parsers/languages/ILanguageStrategy";
+
+class MockTypeScriptStrategy implements ILanguageStrategy {
+  readonly language = "typescript";
+  readonly extensions = [".ts", ".tsx", ".js", ".jsx"] as const;
+
+  extract(source: string, ext?: string): SymbolInfo[] {
+    const symbols: SymbolInfo[] = [];
+    
+    if (source.includes("class DataService")) {
+      symbols.push({
+        name: "DataService",
+        type: "class",
+        startLine: 1,
+        endLine: 3,
+        content: source,
+        signature: "export class DataService",
+      });
+    }
+    
+    return symbols;
+  }
+}
 
 function makeRetriever(chunks: RetrievedChunk[]): IRetriever {
   return { retrieve: async () => chunks };
@@ -37,7 +61,8 @@ describe("RAG Pipeline integration", () => {
   });
 
   it("parses TypeScript code and builds context for a code query", async () => {
-    const parser = new CodeStructuralParser();
+    const mockRegistry = LanguageRegistry.create([new MockTypeScriptStrategy()]);
+    const parser = new CodeStructuralParser(mockRegistry);
     const code = `export class DataService {\n  async fetchData(id: string): Promise<string> {\n    return \`data-\${id}\`;\n  }\n}`;
     const chunks = await parser.parse(code, "service.ts");
 

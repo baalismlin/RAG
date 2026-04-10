@@ -32,6 +32,10 @@ export interface CodeMetadata {
   startLine: number;
   endLine: number;
   chunkIndex: number;
+  signature?: string;
+  docComment?: string;
+  modifiers?: string[];
+  parentName?: string;
 }
 
 export type AnyChunk = DocumentChunk | CodeChunk;

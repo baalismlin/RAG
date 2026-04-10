@@ -1,10 +1,101 @@
 import { CodeStructuralParser } from "@/parsers/CodeStructuralParser";
+import { LanguageRegistry } from "@/parsers/languages/LanguageRegistry";
+import { ILanguageStrategy, SymbolInfo } from "@/parsers/languages/ILanguageStrategy";
+
+class MockTypeScriptStrategy implements ILanguageStrategy {
+  readonly language = "typescript";
+  readonly extensions = [".ts", ".tsx", ".js", ".jsx"] as const;
+
+  extract(source: string, ext?: string): SymbolInfo[] {
+    const symbols: SymbolInfo[] = [];
+    
+    // Mock extraction for common patterns
+    if (source.includes("function greet")) {
+      symbols.push({
+        name: "greet",
+        type: "function",
+        startLine: 1,
+        endLine: 2,
+        content: source,
+        signature: "export function greet(name: string): string",
+      });
+    }
+    if (source.includes("class MyService")) {
+      symbols.push({
+        name: "MyService",
+        type: "class",
+        startLine: 1,
+        endLine: 3,
+        content: source,
+        signature: "export class MyService",
+      });
+    }
+    if (source.includes("interface IConfig")) {
+      symbols.push({
+        name: "IConfig",
+        type: "interface",
+        startLine: 1,
+        endLine: 3,
+        content: source,
+        signature: "export interface IConfig",
+      });
+    }
+    if (source.includes("class DataService")) {
+      symbols.push({
+        name: "DataService",
+        type: "class",
+        startLine: 1,
+        endLine: 3,
+        content: source,
+        signature: "export class DataService",
+      });
+    }
+    
+    return symbols;
+  }
+}
+
+class MockPythonStrategy implements ILanguageStrategy {
+  readonly language = "python";
+  readonly extensions = [".py"] as const;
+
+  extract(source: string): SymbolInfo[] {
+    const symbols: SymbolInfo[] = [];
+    
+    if (source.includes("class Calculator")) {
+      symbols.push({
+        name: "Calculator",
+        type: "class",
+        startLine: 1,
+        endLine: 3,
+        content: source,
+        signature: "class Calculator",
+      });
+    }
+    if (source.includes("def process")) {
+      symbols.push({
+        name: "process",
+        type: "function",
+        startLine: 1,
+        endLine: 2,
+        content: source,
+        signature: "def process(data)",
+      });
+    }
+    
+    return symbols;
+  }
+}
 
 describe("CodeStructuralParser", () => {
   let parser: CodeStructuralParser;
 
   beforeEach(() => {
-    parser = new CodeStructuralParser();
+    const mockRegistry = LanguageRegistry.create([
+      new MockTypeScriptStrategy(),
+      new MockPythonStrategy(),
+    ]);
+    parser = new CodeStructuralParser(mockRegistry);
   });
 
   it("extracts a TypeScript function", async () => {
