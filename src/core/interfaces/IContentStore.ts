@@ -1,5 +1,6 @@
 import { IStorage } from "./IStorage"
 import { AnyChunk } from "../types/Document"
+import { CodeSymbol, SymbolRelation } from "../types/CodeKnowledge"
 
 /**
  * Base interface for content stores (DocumentStore and CodeKnowledgeStore).
@@ -10,8 +11,15 @@ export interface IContentStore extends IStorage {
    * Index content from a file.
    * @param filePath - The file path to index
    * @param chunks - The chunks to store
+   * @param symbols - Optional symbols to store (for code stores)
+   * @param relations - Optional relations to store (for code stores)
    */
-  indexFile(filePath: string, chunks: AnyChunk[]): Promise<void>
+  indexFile(
+    filePath: string,
+    chunks: AnyChunk[],
+    symbols?: CodeSymbol[],
+    relations?: SymbolRelation[]
+  ): Promise<void>
 
   /**
    * Perform semantic search on stored content.

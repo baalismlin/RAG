@@ -5,26 +5,24 @@ import { IGraphStore } from "@/core/interfaces/IGraphStore"
 import { CodeSymbol, SymbolRelation, RelationType, TraversalNode } from "@/core/types/CodeKnowledge"
 import { AnyChunk } from "@/core/types/Document"
 import { RetrievedChunk } from "@/core/types/QueryResult"
-import * as fs from "fs/promises"
-import { RelationExtractor } from "@/ast/RelationExtractor"
 
 export class CodeKnowledgeStore implements IContentStore {
-  private readonly relationExtractor = new RelationExtractor()
-
   constructor(
     private readonly vectorStore: IVectorStore,
     private readonly symbolStore: ISymbolStore,
     private readonly graphStore: IGraphStore
   ) {}
 
-  async indexFile(filePath: string, chunks: AnyChunk[]): Promise<void> {
-    const content = await fs.readFile(filePath, "utf-8").catch(() => "")
-    const { symbols, relations } = this.relationExtractor.extract(content, filePath)
-
+  async indexFile(
+    filePath: string,
+    chunks: AnyChunk[],
+    symbols?: CodeSymbol[],
+    relations?: SymbolRelation[]
+  ): Promise<void> {
     await Promise.all([
       this.vectorStore.addChunks(chunks),
-      this.symbolStore.upsertSymbols(symbols),
-      this.graphStore.upsertRelations(relations),
+      symbols ? this.symbolStore.upsertSymbols(symbols) : Promise.resolve(),
+      relations ? this.graphStore.upsertRelations(relations) : Promise.resolve(),
     ])
   }
 

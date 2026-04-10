@@ -3,7 +3,8 @@ import * as path from "path"
 import { IContentStore } from "@/core/interfaces/IContentStore"
 import { IndexingResult, SyncResult } from "@/core/interfaces/IIndexing"
 import { LoaderFactory } from "@/loaders/LoaderFactory"
-import { AnyChunk, isCodeChunk } from "@/core/types/Document"
+import { isCodeChunk } from "@/core/types/Document"
+import { UnifiedCodeParser } from "@/parsers/UnifiedCodeParser"
 
 interface ManifestEntry {
   mtime: number
@@ -18,6 +19,7 @@ interface FileManifest {
 export class IndexingService {
   private readonly docStore: IContentStore
   private readonly codeStore: IContentStore
+  private readonly codeParser = new UnifiedCodeParser()
 
   constructor(docStore: IContentStore, codeStore: IContentStore) {
     this.docStore = docStore
@@ -125,20 +127,32 @@ export class IndexingService {
     }
 
     try {
-      const chunks = await loader.load(filePath)
       result.totalFiles = 1
 
-      const docChunks = chunks.filter((c) => !isCodeChunk(c))
-      const codeChunks = chunks.filter(isCodeChunk)
+      // Check if this is a code file
+      const isCode = loader.constructor.name === "CodeLoader"
 
-      if (docChunks.length > 0) await this.docStore.indexFile(filePath, docChunks)
-      if (codeChunks.length > 0) {
-        await this.codeStore.indexFile(filePath, codeChunks)
+      if (isCode) {
+        // Use UnifiedCodeParser for code files (parse once for chunks, symbols, relations)
+        const parsed = await this.codeParser.parse(filePath)
+        await this.codeStore.indexFile(filePath, parsed.chunks, parsed.symbols, parsed.relations)
+        result.codeChunks = parsed.chunks.length
+        result.totalChunks = parsed.chunks.length
+      } else {
+        // Use loader for document files
+        const chunks = await loader.load(filePath)
+        const docChunks = chunks.filter((c) => !isCodeChunk(c))
+        const codeChunks = chunks.filter(isCodeChunk)
+
+        if (docChunks.length > 0) await this.docStore.indexFile(filePath, docChunks)
+        if (codeChunks.length > 0) {
+          await this.codeStore.indexFile(filePath, codeChunks)
+        }
+
+        result.docChunks = docChunks.length
+        result.codeChunks = codeChunks.length
+        result.totalChunks = chunks.length
       }
-
-      result.docChunks = docChunks.length
-      result.codeChunks = codeChunks.length
-      result.totalChunks = chunks.length
     } catch (err) {
       result.errors.push(`Failed to index ${filePath}: ${String(err)}`)
     }

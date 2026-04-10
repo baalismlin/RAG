@@ -1,6 +1,17 @@
-import { createHash } from "crypto"
+import * as fs from "fs/promises"
 import * as path from "path"
+import { createHash } from "crypto"
+import { v4 as uuidv4 } from "uuid"
+import { LanguageRegistry } from "./languages/LanguageRegistry"
+import { CodeChunk } from "@/core/types/Document"
 import { CodeSymbol, SymbolRelation, SymbolKind } from "@/core/types/CodeKnowledge"
+import { SymbolInfo } from "./languages/ILanguageStrategy"
+
+export interface ParsedCode {
+  chunks: CodeChunk[]
+  symbols: CodeSymbol[]
+  relations: SymbolRelation[]
+}
 
 function symbolId(filePath: string, name: string, type: string, startLine: number): string {
   return createHash("sha256")
@@ -9,46 +20,35 @@ function symbolId(filePath: string, name: string, type: string, startLine: numbe
     .slice(0, 32)
 }
 
-interface RawSymbol {
-  name: string
-  type: SymbolKind
-  startLine: number
-  endLine: number
-  content: string
-  signature?: string
-}
+export class UnifiedCodeParser {
+  private readonly languageRegistry = LanguageRegistry.getDefault()
 
-export class RelationExtractor {
-  extract(
-    content: string,
-    filePath: string
-  ): { symbols: CodeSymbol[]; relations: SymbolRelation[] } {
-    const language = this.detectLanguage(filePath)
-    const rawSymbols =
-      language === "python" ? this.extractPythonSymbols(content) : this.extractJsTsSymbols(content)
+  async parse(filePath: string): Promise<ParsedCode> {
+    const content = await fs.readFile(filePath, "utf-8")
+    const ext = path.extname(filePath).toLowerCase()
+    const language = this.detectLanguage(ext)
 
-    const symbols: CodeSymbol[] = rawSymbols.map((s) => ({
-      id: symbolId(filePath, s.name, s.type, s.startLine),
-      name: s.name,
-      symbolType: s.type,
+    const strategy = this.languageRegistry.get(ext)
+    const symbolInfos = strategy ? strategy.extract(content, ext) : []
+
+    const symbols: CodeSymbol[] = symbolInfos.map((info: SymbolInfo) => ({
+      id: symbolId(filePath, info.name, info.type, info.startLine),
+      name: info.name,
+      symbolType: info.type as SymbolKind,
       language,
       filePath,
-      startLine: s.startLine,
-      endLine: s.endLine,
-      content: s.content,
-      signature: s.signature,
+      startLine: info.startLine,
+      endLine: info.endLine,
+      content: info.content,
     }))
 
-    const relations: SymbolRelation[] =
-      language === "python"
-        ? this.extractPythonRelations(content, filePath, symbols)
-        : this.extractJsTsRelations(content, filePath, symbols)
+    const chunks = this.createChunks(content, filePath, language, symbols)
+    const relations = this.extractRelations(content, filePath, symbols, language)
 
-    return { symbols, relations }
+    return { chunks, symbols, relations }
   }
 
-  private detectLanguage(filePath: string): string {
-    const ext = path.extname(filePath).toLowerCase()
+  private detectLanguage(ext: string): string {
     const map: Record<string, string> = {
       ".ts": "typescript",
       ".tsx": "typescript",
@@ -59,83 +59,109 @@ export class RelationExtractor {
     return map[ext] ?? "unknown"
   }
 
-  private extractJsTsSymbols(content: string): RawSymbol[] {
-    const symbols: RawSymbol[] = []
+  private createChunks(
+    content: string,
+    filePath: string,
+    language: string,
+    symbols: CodeSymbol[]
+  ): CodeChunk[] {
     const lines = content.split("\n")
+    const chunks: CodeChunk[] = []
+    const chunkSize = 50
 
-    const patterns: Array<{ regex: RegExp; type: SymbolKind; nameGroup: number }> = [
-      {
-        regex: /^export\s+(?:default\s+)?(?:abstract\s+)?class\s+(\w+)/,
-        type: "class",
-        nameGroup: 1,
-      },
-      { regex: /^class\s+(\w+)/, type: "class", nameGroup: 1 },
-      { regex: /^export\s+(?:default\s+)?interface\s+(\w+)/, type: "interface", nameGroup: 1 },
-      { regex: /^interface\s+(\w+)/, type: "interface", nameGroup: 1 },
-      {
-        regex: /^export\s+(?:default\s+)?(?:async\s+)?function\s*\*?\s*(\w+)/,
-        type: "function",
-        nameGroup: 1,
-      },
-      { regex: /^(?:async\s+)?function\s*\*?\s*(\w+)/, type: "function", nameGroup: 1 },
-      {
-        regex: /^export\s+(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?\(/,
-        type: "function",
-        nameGroup: 1,
-      },
-      { regex: /^(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?\(/, type: "function", nameGroup: 1 },
-      { regex: /^export\s+(?:const|let|var)\s+(\w+)/, type: "variable", nameGroup: 1 },
-    ]
+    if (symbols.length === 0) {
+      // No symbols found, chunk by line count
+      for (let i = 0; i < lines.length; i += chunkSize) {
+        const chunkLines = lines.slice(i, i + chunkSize)
+        chunks.push({
+          id: uuidv4(),
+          content: chunkLines.join("\n"),
+          metadata: {
+            source: filePath,
+            type: "code",
+            language,
+            symbolType: "other",
+            symbolName: "",
+            filePath,
+            chunkIndex: chunks.length,
+            startLine: i + 1,
+            endLine: Math.min(i + chunkSize, lines.length),
+          },
+        })
+      }
+      return chunks
+    }
 
-    let i = 0
-    while (i < lines.length) {
-      const line = lines[i].trim()
-      let matched = false
-      for (const { regex, type, nameGroup } of patterns) {
-        const m = line.match(regex)
-        if (m) {
-          const name = m[nameGroup]
-          const startLine = i + 1
-          const endLine = this.findBlockEnd(lines, i)
-          const blockContent = lines.slice(i, endLine).join("\n")
-          symbols.push({ name, type, startLine, endLine, content: blockContent, signature: line })
-          i = endLine
-          matched = true
-          break
+    // Chunk by symbols
+    for (const symbol of symbols) {
+      const symbolLines = lines.slice(symbol.startLine - 1, symbol.endLine)
+      chunks.push({
+        id: uuidv4(),
+        content: symbolLines.join("\n"),
+        metadata: {
+          source: filePath,
+          type: "code",
+          language,
+          symbolType: symbol.symbolType,
+          symbolName: symbol.name,
+          filePath,
+          chunkIndex: chunks.length,
+          startLine: symbol.startLine,
+          endLine: symbol.endLine,
+        },
+      })
+    }
+
+    // Add remaining lines as chunks
+    const coveredRanges = symbols.map((s) => ({ start: s.startLine, end: s.endLine }))
+    let currentLine = 1
+    for (let i = 0; i < lines.length; i += chunkSize) {
+      const start = i + 1
+      const end = Math.min(i + chunkSize, lines.length)
+
+      // Skip if this range overlaps with any symbol
+      const overlaps = coveredRanges.some((r) => start <= r.end && end >= r.start)
+
+      if (!overlaps) {
+        const chunkLines = lines.slice(start - 1, end)
+        if (chunkLines.length > 0) {
+          chunks.push({
+            id: uuidv4(),
+            content: chunkLines.join("\n"),
+            metadata: {
+              source: filePath,
+              type: "code",
+              language,
+              symbolType: "other",
+              symbolName: "",
+              filePath,
+              chunkIndex: chunks.length,
+              startLine: start,
+              endLine: end,
+            },
+          })
         }
       }
-      if (!matched) i++
     }
-    return symbols
+
+    return chunks
   }
 
-  private extractPythonSymbols(content: string): RawSymbol[] {
-    const symbols: RawSymbol[] = []
+  private extractRelations(
+    content: string,
+    filePath: string,
+    symbols: CodeSymbol[],
+    language: string
+  ): SymbolRelation[] {
+    const relations: SymbolRelation[] = []
     const lines = content.split("\n")
-    let i = 0
-    while (i < lines.length) {
-      const line = lines[i]
-      const classMatch = line.match(/^class\s+(\w+)/)
-      const funcMatch = line.match(/^def\s+(\w+)/)
-      if (classMatch ?? funcMatch) {
-        const name = (classMatch ?? funcMatch)![1]
-        const type: SymbolKind = classMatch ? "class" : "function"
-        const startLine = i + 1
-        const endLine = this.findPythonBlockEnd(lines, i)
-        symbols.push({
-          name,
-          type,
-          startLine,
-          endLine,
-          content: lines.slice(i, endLine).join("\n"),
-          signature: line.trim(),
-        })
-        i = endLine
-      } else {
-        i++
-      }
+    const symbolByName = new Map(symbols.map((s) => [s.name, s]))
+
+    if (language === "python") {
+      return this.extractPythonRelations(content, filePath, symbols)
     }
-    return symbols
+
+    return this.extractJsTsRelations(content, filePath, symbols)
   }
 
   private extractJsTsRelations(
@@ -298,30 +324,5 @@ export class RelationExtractor {
     return symbols
       .filter((s) => s.startLine <= lineNo && s.endLine >= lineNo)
       .sort((a, b) => b.startLine - a.startLine)[0]
-  }
-
-  private findBlockEnd(lines: string[], startIdx: number): number {
-    let depth = 0
-    let foundOpen = false
-    for (let i = startIdx; i < lines.length; i++) {
-      for (const ch of lines[i]) {
-        if (ch === "{") {
-          depth++
-          foundOpen = true
-        } else if (ch === "}") depth--
-      }
-      if (foundOpen && depth === 0) return i + 1
-    }
-    return Math.min(startIdx + 50, lines.length)
-  }
-
-  private findPythonBlockEnd(lines: string[], startIdx: number): number {
-    const baseIndent = lines[startIdx].match(/^(\s*)/)?.[1].length ?? 0
-    for (let i = startIdx + 1; i < lines.length; i++) {
-      if (lines[i].trim() === "") continue
-      const indent = lines[i].match(/^(\s*)/)?.[1].length ?? 0
-      if (indent <= baseIndent) return i
-    }
-    return lines.length
   }
 }
