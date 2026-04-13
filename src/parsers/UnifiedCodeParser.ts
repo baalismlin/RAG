@@ -1,4 +1,3 @@
-import * as fs from "fs/promises"
 import * as path from "path"
 import { createHash } from "crypto"
 import { v4 as uuidv4 } from "uuid"
@@ -14,11 +13,9 @@ function symbolId(filePath: string, name: string, type: string, startLine: numbe
 }
 
 export class UnifiedCodeParser implements ICodeParser {
-  readonly supportedLanguages = ["typescript", "javascript", "python"]
   private readonly languageRegistry = LanguageRegistry.getDefault()
 
-  async parse(filePath: string): Promise<ParsedResult> {
-    const content = await fs.readFile(filePath, "utf-8")
+  async parse(content: string, filePath: string): Promise<ParsedResult> {
     const ext = path.extname(filePath).toLowerCase()
     const language = this.detectLanguage(ext)
 

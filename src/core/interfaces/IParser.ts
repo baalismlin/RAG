@@ -19,18 +19,6 @@ export interface IDocumentParser {
  * Parser specialized for code content.
  * Produces ParsedCode containing chunks, symbols, and relations.
  */
-export interface ICodeParser {
-  /**
-   * Parse code file into chunks, symbols, and relations.
-   * Code parsers extract functions, classes, interfaces, and other symbols.
-   * @param filePath - Path to the code file to parse
-   * @returns ParsedCode containing chunks, symbols, and relations
-   */
-  parse(filePath: string): Promise<ParsedResult>
 
-  /**
-   * List of programming languages this parser supports.
-   * Used to determine if the parser can handle a given code file.
-   */
-  readonly supportedLanguages: string[]
-}
+export type ICodeParser = IDocumentParser
+

@@ -73,7 +73,7 @@ describe("RAG Pipeline integration", () => {
     await fs.writeFile(tmpFile, code, "utf-8")
 
     try {
-      const parsed = await parser.parse(tmpFile)
+      const parsed = await parser.parse(code, tmpFile)
       const chunks = parsed.chunks
 
       expect(chunks.length).toBeGreaterThan(0)
