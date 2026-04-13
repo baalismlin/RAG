@@ -4,6 +4,11 @@ import { AnyChunk } from "@/core/types/Document"
 import { RetrievedChunk } from "@/core/types/QueryResult"
 import { CodeSymbol, SymbolRelation } from "@/core/types/CodeKnowledge"
 
+/**
+ * High-level document storage abstraction.
+ * Wraps a vector store to provide document-specific storage operations.
+ * Implements IContentStore interface.
+ */
 export class DocumentStore implements IContentStore {
   constructor(private readonly vectorStore: IVectorStore) {}
 

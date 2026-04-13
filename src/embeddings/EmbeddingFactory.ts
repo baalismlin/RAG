@@ -1,7 +1,6 @@
 import { IEmbedding } from "@/core/interfaces/IEmbedding"
 import { OllamaEmbedding } from "./OllamaEmbedding"
-
-export type EmbeddingProvider = "ollama"
+import { EmbeddingProvider } from "@/core/types/Config"
 
 export class EmbeddingFactory {
   static create(provider: EmbeddingProvider = "ollama"): IEmbedding {

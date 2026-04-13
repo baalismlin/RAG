@@ -2,8 +2,8 @@ import { createHash } from "crypto"
 import * as path from "path"
 import { ICodeParser } from "@/core/interfaces/IParser"
 import { CodeChunk } from "@/core/types/Document"
+import { SymbolInfo } from "@/core/types/Parsers"
 import { LanguageRegistry } from "./languages/LanguageRegistry"
-import { SymbolInfo } from "./languages/ILanguageStrategy"
 
 function chunkId(source: string, qualifier: string): string {
   return createHash("sha256").update(`${source}::${qualifier}`).digest("hex").slice(0, 32)

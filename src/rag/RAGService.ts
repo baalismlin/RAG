@@ -2,18 +2,11 @@ import { IRAGService } from "@/core/interfaces/IRAGService"
 import { IRetriever } from "@/core/interfaces/IRetriever"
 import { QueryResult, ChatMessage, RetrievedChunk } from "@/core/types/QueryResult"
 import { QueryType } from "@/core/types/Document"
+import { RAGServiceDeps } from "@/core/types/RAG"
 import { QueryClassifier } from "./QueryClassifier"
 import { ContextBuilder } from "./ContextBuilder"
 import { SYSTEM_PROMPT, buildUserPrompt } from "./PromptTemplates"
-
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434"
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "llama3.2"
-
-export interface RAGServiceDeps {
-  docRetriever: IRetriever
-  codeRetriever: IRetriever
-  hybridRetriever: IRetriever
-}
+import { config } from "@/lib/config"
 
 export class RAGService implements IRAGService {
   private readonly classifier: QueryClassifier
@@ -32,7 +25,7 @@ export class RAGService implements IRAGService {
     const context = this.contextBuilder.build(sources)
     const answer = await this.callLLM(question, context, queryType, history)
 
-    return { answer, queryType, sources, contextUsed: context, model: OLLAMA_MODEL }
+    return { answer, queryType, sources, contextUsed: context, model: config.ollama.model }
   }
 
   private async retrieve(question: string, queryType: QueryType): Promise<RetrievedChunk[]> {
@@ -58,10 +51,10 @@ export class RAGService implements IRAGService {
       { role: "user", content: buildUserPrompt(question, context, queryType) },
     ]
 
-    const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    const response = await fetch(`${config.ollama.baseUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: OLLAMA_MODEL, messages, stream: false }),
+      body: JSON.stringify({ model: config.ollama.model, messages, stream: false }),
     })
 
     if (!response.ok) {

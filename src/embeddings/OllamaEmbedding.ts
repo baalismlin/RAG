@@ -1,13 +1,11 @@
 import { IEmbedding } from "@/core/interfaces/IEmbedding"
-
-const DEFAULT_MODEL = process.env.OLLAMA_EMBEDDING_MODEL ?? "nomic-embed-text"
-const DEFAULT_BASE_URL = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434"
+import { config } from "@/lib/config"
 
 export class OllamaEmbedding implements IEmbedding {
   private readonly model: string
   private readonly baseUrl: string
 
-  constructor(model = DEFAULT_MODEL, baseUrl = DEFAULT_BASE_URL) {
+  constructor(model = config.ollama.embeddingModel, baseUrl = config.ollama.baseUrl) {
     this.model = model
     this.baseUrl = baseUrl
   }

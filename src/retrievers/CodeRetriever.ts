@@ -1,14 +1,13 @@
 import { IRetriever } from "@/core/interfaces/IRetriever"
 import { IVectorStore } from "@/core/interfaces/IVectorStore"
 import { RetrievedChunk } from "@/core/types/QueryResult"
-
-const DEFAULT_TOP_K = parseInt(process.env.TOP_K_CODE ?? "4", 10)
+import { config } from "@/lib/config"
 
 export class CodeRetriever implements IRetriever {
   private readonly store: IVectorStore
   private readonly defaultTopK: number
 
-  constructor(store: IVectorStore, defaultTopK = DEFAULT_TOP_K) {
+  constructor(store: IVectorStore, defaultTopK = config.retrieval.topKCode) {
     this.store = store
     this.defaultTopK = defaultTopK
   }

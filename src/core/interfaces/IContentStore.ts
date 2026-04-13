@@ -1,6 +1,7 @@
 import { IStorage } from "./IStorage"
 import { AnyChunk } from "../types/Document"
 import { CodeSymbol, SymbolRelation } from "../types/CodeKnowledge"
+import { RetrievedChunk } from "../types/QueryResult"
 
 /**
  * Base interface for content stores (DocumentStore and CodeKnowledgeStore).
@@ -24,5 +25,5 @@ export interface IContentStore extends IStorage {
    * @param query - Search query text
    * @param topK - Maximum number of results to return
    */
-  semanticSearch(query: string, topK?: number): Promise<any[]>
+  semanticSearch(query: string, topK?: number): Promise<RetrievedChunk[]>
 }

@@ -1,5 +1,5 @@
 import Parser from "tree-sitter"
-import { ILanguageStrategy, SymbolInfo } from "./ILanguageStrategy"
+import { ILanguageStrategy, SymbolInfo } from "@/core/types/Parsers"
 
 const PyGrammar = require("tree-sitter-python")
 

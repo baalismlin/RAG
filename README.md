@@ -38,6 +38,7 @@ Frontend (Next.js + Tailwind CSS)
 | Node.js     | ≥ 20    |             |
 | Ollama      | latest  | `ollama.ai` |
 | ChromaDB    | ≥ 0.4   | Run locally |
+| PostgreSQL  | ≥ 15    | For code symbol/graph storage |
 
 ## Quick Start
 
@@ -66,14 +67,29 @@ pip install chromadb
 chroma run --host 0.0.0.0 --port 8000
 ```
 
-### 4. Configure environment
+### 4. Start PostgreSQL
+
+```bash
+# Using Docker Compose (recommended)
+docker-compose up -d postgres
+
+# Or run PostgreSQL manually with the settings from .env.example
+```
+
+### 5. Run database migrations
+
+```bash
+npm run db:migrate
+```
+
+### 6. Configure environment
 
 ```bash
 cp .env.example .env.local
 # Edit .env.local as needed
 ```
 
-### 5. Index your data
+### 7. Index your data
 
 ```bash
 # Index sample data
@@ -83,7 +99,7 @@ npm run index
 npm run index -- ./my-docs ./my-code
 ```
 
-### 6. Start the dev server
+### 8. Start the dev server
 
 ```bash
 npm run dev
@@ -110,7 +126,18 @@ src/
 ├── loaders/                 # File loaders
 ├── parsers/                 # Document + code parsers
 ├── embeddings/              # Embedding providers
-├── vectorstore/             # ChromaDB stores (dual index)
+├── storage/                 # Storage layer
+│   ├── vector/              # ChromaDB stores (dual index)
+│   │   ├── ChromaDocumentStore.ts
+│   │   ├── ChromaCodeStore.ts
+│   │   └── VectorStoreFactory.ts
+│   ├── relational/          # PostgreSQL stores (code symbols/graph)
+│   │   ├── PostgresClient.ts
+│   │   ├── SymbolStore.ts
+│   │   ├── GraphStore.ts
+│   │   └── schema.sql
+│   ├── DocumentStore.ts     # High-level document store
+│   └── CodeKnowledgeStore.ts # High-level code knowledge store
 ├── retrievers/              # Retrieval strategies
 ├── rag/                     # RAG pipeline core
 │   ├── QueryClassifier.ts
@@ -119,8 +146,12 @@ src/
 │   └── RAGService.ts
 ├── indexer/                 # IndexingService
 └── lib/                     # Singletons/factories
+│   ├── config.ts            # Centralized configuration
+│   └── ragServiceFactory.ts
 scripts/
-└── index.ts                 # CLI indexing tool
+├── index.ts                 # CLI indexing tool
+├── chroma.ts                # ChromaDB utilities
+└── migrate.ts               # Database migration
 tests/
 ├── unit/
 │   ├── parsers/

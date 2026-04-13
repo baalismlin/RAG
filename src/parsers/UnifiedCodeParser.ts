@@ -5,13 +5,7 @@ import { v4 as uuidv4 } from "uuid"
 import { LanguageRegistry } from "./languages/LanguageRegistry"
 import { CodeChunk } from "@/core/types/Document"
 import { CodeSymbol, SymbolRelation, SymbolKind } from "@/core/types/CodeKnowledge"
-import { SymbolInfo } from "./languages/ILanguageStrategy"
-
-export interface ParsedCode {
-  chunks: CodeChunk[]
-  symbols: CodeSymbol[]
-  relations: SymbolRelation[]
-}
+import { ParsedCode, SymbolInfo } from "@/core/types/Parsers"
 
 function symbolId(filePath: string, name: string, type: string, startLine: number): string {
   return createHash("sha256")

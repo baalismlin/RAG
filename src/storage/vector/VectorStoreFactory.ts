@@ -1,14 +1,17 @@
 import { IVectorStore } from "@/core/interfaces/IVectorStore"
 import { IEmbedding } from "@/core/interfaces/IEmbedding"
-import { ChromaDocumentStore } from "./ChromaDocumentStore"
-import { ChromaCodeStore } from "./ChromaCodeStore"
+import { ChromaDocumentVectorStore } from "./ChromaDocumentStore"
+import { ChromaCodeVectorStore } from "./ChromaCodeStore"
 
+/**
+ * Factory for creating vector store instances.
+ */
 export class VectorStoreFactory {
   static createDocumentStore(embedding: IEmbedding): IVectorStore {
-    return new ChromaDocumentStore(embedding)
+    return new ChromaDocumentVectorStore(embedding)
   }
 
   static createCodeStore(embedding: IEmbedding): IVectorStore {
-    return new ChromaCodeStore(embedding)
+    return new ChromaCodeVectorStore(embedding)
   }
 }

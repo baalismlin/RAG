@@ -1,11 +1,12 @@
 import { Pool, PoolConfig } from "pg"
+import { config } from "@/lib/config"
 
-const config: PoolConfig = {
-  host: process.env.PG_HOST ?? "localhost",
-  port: Number(process.env.PG_PORT ?? 5432),
-  database: process.env.PG_DATABASE ?? "rag",
-  user: process.env.PG_USER ?? "rag",
-  password: process.env.PG_PASSWORD ?? "rag",
+const poolConfig: PoolConfig = {
+  host: config.postgres.host,
+  port: config.postgres.port,
+  database: config.postgres.database,
+  user: config.postgres.user,
+  password: config.postgres.password,
   max: 10,
   idleTimeoutMillis: 30_000,
 }
@@ -14,7 +15,7 @@ let _pool: Pool | null = null
 
 export function getPool(): Pool {
   if (!_pool) {
-    _pool = new Pool(config)
+    _pool = new Pool(poolConfig)
     _pool.on("error", (err: Error) => {
       console.error("[PostgresClient] idle client error:", err.message)
     })

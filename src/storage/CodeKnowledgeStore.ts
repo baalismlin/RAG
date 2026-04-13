@@ -6,6 +6,11 @@ import { CodeSymbol, SymbolRelation, RelationType, TraversalNode } from "@/core/
 import { AnyChunk } from "@/core/types/Document"
 import { RetrievedChunk } from "@/core/types/QueryResult"
 
+/**
+ * High-level code knowledge storage abstraction.
+ * Aggregates vector, symbol, and graph stores to provide comprehensive code knowledge operations.
+ * Implements IContentStore interface with additional code-specific methods.
+ */
 export class CodeKnowledgeStore implements IContentStore {
   constructor(
     private readonly vectorStore: IVectorStore,

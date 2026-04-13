@@ -3,11 +3,13 @@ import { IVectorStore } from "@/core/interfaces/IVectorStore"
 import { IEmbedding } from "@/core/interfaces/IEmbedding"
 import { AnyChunk } from "@/core/types/Document"
 import { RetrievedChunk } from "@/core/types/QueryResult"
+import { config } from "@/lib/config"
 
-const DEFAULT_COLLECTION = process.env.CHROMA_CODE_COLLECTION ?? "rag_code"
-const DEFAULT_CHROMA_URL = process.env.CHROMA_URL ?? "http://localhost:8000"
-
-export class ChromaCodeStore implements IVectorStore {
+/**
+ * ChromaDB implementation for code vector storage.
+ * Implements IVectorStore interface for storing and retrieving code chunks.
+ */
+export class ChromaCodeVectorStore implements IVectorStore {
   private readonly client: ChromaClient
   private collection: Collection | null = null
   private readonly collectionName: string
@@ -15,8 +17,8 @@ export class ChromaCodeStore implements IVectorStore {
 
   constructor(
     embedding: IEmbedding,
-    collectionName = DEFAULT_COLLECTION,
-    chromaUrl = DEFAULT_CHROMA_URL
+    collectionName = config.chroma.codeCollection,
+    chromaUrl = config.chroma.url
   ) {
     this.client = new ChromaClient({ path: chromaUrl })
     this.collectionName = collectionName
