@@ -2,7 +2,7 @@
 
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { ChatMessage } from "@/core/types/QueryResult"
+import { ChatMessage } from "@/core/types"
 import { SourceCard } from "./SourceCard"
 
 interface MessageBubbleProps {

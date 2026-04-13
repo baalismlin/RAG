@@ -1,4 +1,4 @@
-import { ILanguageStrategy } from "@/core/types/Parsers"
+import { ILanguageStrategy } from "@/core/types"
 import { TypeScriptStrategy } from "./TypeScriptStrategy"
 import { PythonStrategy } from "./PythonStrategy"
 

@@ -1,6 +1,5 @@
 import { IStorage } from "./IStorage"
-import { AnyChunk } from "../types/Document"
-import { RetrievedChunk } from "../types/QueryResult"
+import { AnyChunk, RetrievedChunk } from "../types"
 
 /**
  * Vector store interface for managing document/code embeddings.

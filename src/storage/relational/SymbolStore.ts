@@ -1,5 +1,5 @@
 import { ISymbolStore, SymbolLookupOptions } from "@/core/interfaces/ISymbolStore"
-import { CodeSymbol } from "@/core/types/CodeKnowledge"
+import { CodeSymbol } from "@/core/types"
 import { getPool } from "@/storage/relational/PostgresClient"
 
 export class SymbolStore implements ISymbolStore {

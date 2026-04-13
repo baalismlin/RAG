@@ -1,5 +1,5 @@
 import { IRetriever } from "@/core/interfaces/IRetriever"
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import { RetrievedChunk } from "@/core/types"
 
 export class HybridRetriever implements IRetriever {
   private readonly docRetriever: IRetriever

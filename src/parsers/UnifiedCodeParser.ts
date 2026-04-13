@@ -2,10 +2,9 @@ import * as fs from "fs/promises"
 import * as path from "path"
 import { createHash } from "crypto"
 import { v4 as uuidv4 } from "uuid"
+import { ICodeParser } from "@/core/interfaces/IParser"
 import { LanguageRegistry } from "./languages/LanguageRegistry"
-import { CodeChunk } from "@/core/types/Document"
-import { CodeSymbol, SymbolRelation, SymbolKind } from "@/core/types/CodeKnowledge"
-import { ParsedCode, SymbolInfo } from "@/core/types/Parsers"
+import { CodeChunk, CodeSymbol, SymbolRelation, SymbolKind, ParsedResult, SymbolInfo } from "@/core/types"
 
 function symbolId(filePath: string, name: string, type: string, startLine: number): string {
   return createHash("sha256")
@@ -14,10 +13,11 @@ function symbolId(filePath: string, name: string, type: string, startLine: numbe
     .slice(0, 32)
 }
 
-export class UnifiedCodeParser {
+export class UnifiedCodeParser implements ICodeParser {
+  readonly supportedLanguages = ["typescript", "javascript", "python"]
   private readonly languageRegistry = LanguageRegistry.getDefault()
 
-  async parse(filePath: string): Promise<ParsedCode> {
+  async parse(filePath: string): Promise<ParsedResult> {
     const content = await fs.readFile(filePath, "utf-8")
     const ext = path.extname(filePath).toLowerCase()
     const language = this.detectLanguage(ext)

@@ -1,5 +1,5 @@
 import { IRetriever, IRerankRetriever } from "@/core/interfaces/IRetriever"
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import { RetrievedChunk } from "@/core/types"
 
 /**
  * Placeholder rerank retriever. Extends a base retriever by fetching more
@@ -28,7 +28,7 @@ export class RerankRetriever implements IRerankRetriever {
     const queryTokens = new Set(query.toLowerCase().split(/\s+/))
     return chunks.map((c) => {
       const contentTokens = c.chunk.content.toLowerCase().split(/\s+/)
-      const overlap = contentTokens.filter((t) => queryTokens.has(t)).length
+      const overlap = contentTokens.filter((t: string) => queryTokens.has(t)).length
       const boost = overlap / Math.max(queryTokens.size, 1)
       return { ...c, score: c.score * 0.7 + boost * 0.3 }
     })

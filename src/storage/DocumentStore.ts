@@ -1,8 +1,6 @@
 import { IContentStore } from "@/core/interfaces/IContentStore"
 import { IVectorStore } from "@/core/interfaces/IVectorStore"
-import { AnyChunk } from "@/core/types/Document"
-import { RetrievedChunk } from "@/core/types/QueryResult"
-import { CodeSymbol, SymbolRelation } from "@/core/types/CodeKnowledge"
+import { AnyChunk, RetrievedChunk, CodeSymbol, SymbolRelation } from "@/core/types"
 
 /**
  * High-level document storage abstraction.

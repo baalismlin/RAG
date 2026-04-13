@@ -1,5 +1,5 @@
 import { ContextBuilder } from "@/rag/ContextBuilder"
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import { RetrievedChunk } from "@/core/types"
 
 describe("ContextBuilder", () => {
   let builder: ContextBuilder

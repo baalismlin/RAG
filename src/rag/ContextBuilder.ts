@@ -1,5 +1,4 @@
-import { RetrievedChunk } from "@/core/types/QueryResult"
-import { isCodeChunk, CodeMetadata } from "@/core/types/Document"
+import { RetrievedChunk, isCodeChunk, CodeMetadata } from "@/core/types"
 
 const MAX_CONTEXT_CHARS = 6000
 

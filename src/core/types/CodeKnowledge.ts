@@ -1,3 +1,7 @@
+/**
+ * Code knowledge graph types
+ */
+
 export type SymbolKind = "class" | "function" | "interface" | "variable" | "method" | "other"
 export type RelationType = "imports" | "extends" | "implements" | "calls" | "uses"
 

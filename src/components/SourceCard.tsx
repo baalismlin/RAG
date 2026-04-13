@@ -1,6 +1,6 @@
 "use client"
 
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import { RetrievedChunk } from "@/core/types"
 
 interface SourceCardProps {
   source: RetrievedChunk

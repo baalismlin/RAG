@@ -1,4 +1,4 @@
-import { QueryResult, ChatMessage } from "../types/QueryResult"
+import { QueryResult, ChatMessage } from "../types"
 
 /**
  * RAG (Retrieval-Augmented Generation) service interface.

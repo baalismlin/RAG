@@ -123,8 +123,15 @@ src/
 ├── core/                    # Interfaces & types (SOLID)
 │   ├── interfaces/
 │   └── types/
+│       ├── Document.ts       # Document/code chunk models + guards
+│       ├── CodeKnowledge.ts  # Symbol/relation graph models
+│       ├── Parsers.ts        # ParsedResult + language strategy contracts
+│       └── index.ts          # Centralized type exports
 ├── loaders/                 # File loaders
 ├── parsers/                 # Document + code parsers
+│   ├── languages/            # TS/JS/Python symbol extraction strategies
+│   ├── SemanticDocumentParser.ts
+│   └── UnifiedCodeParser.ts
 ├── embeddings/              # Embedding providers
 ├── storage/                 # Storage layer
 │   ├── vector/              # ChromaDB stores (dual index)

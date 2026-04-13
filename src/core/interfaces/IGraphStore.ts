@@ -1,5 +1,5 @@
 import { IStorage } from "./IStorage"
-import { SymbolRelation, RelationType, TraversalNode } from "../types/CodeKnowledge"
+import { SymbolRelation, RelationType, TraversalNode } from "../types"
 
 export interface IGraphStore extends IStorage {
   upsertRelations(relations: SymbolRelation[]): Promise<void>

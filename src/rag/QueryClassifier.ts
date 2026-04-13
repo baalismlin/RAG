@@ -1,4 +1,4 @@
-import { QueryType } from "@/core/types/Document"
+import { QueryType } from "@/core/types"
 
 const CODE_KEYWORDS = [
   "function",

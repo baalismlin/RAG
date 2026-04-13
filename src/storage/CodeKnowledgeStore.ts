@@ -2,9 +2,14 @@ import { IContentStore } from "@/core/interfaces/IContentStore"
 import { IVectorStore } from "@/core/interfaces/IVectorStore"
 import { ISymbolStore, SymbolLookupOptions } from "@/core/interfaces/ISymbolStore"
 import { IGraphStore } from "@/core/interfaces/IGraphStore"
-import { CodeSymbol, SymbolRelation, RelationType, TraversalNode } from "@/core/types/CodeKnowledge"
-import { AnyChunk } from "@/core/types/Document"
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import {
+  CodeSymbol,
+  SymbolRelation,
+  RelationType,
+  TraversalNode,
+  AnyChunk,
+  RetrievedChunk,
+} from "@/core/types"
 
 /**
  * High-level code knowledge storage abstraction.

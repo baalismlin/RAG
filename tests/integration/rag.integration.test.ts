@@ -4,14 +4,13 @@
  */
 
 import { SemanticDocumentParser } from "@/parsers/SemanticDocumentParser"
-import { CodeStructuralParser } from "@/parsers/CodeStructuralParser"
+import { UnifiedCodeParser } from "@/parsers/UnifiedCodeParser"
 import { ContextBuilder } from "@/rag/ContextBuilder"
 import { QueryClassifier } from "@/rag/QueryClassifier"
 import { HybridRetriever } from "@/retrievers/HybridRetriever"
 import { IRetriever } from "@/core/interfaces/IRetriever"
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import { RetrievedChunk, isCodeChunk, ILanguageStrategy, SymbolInfo } from "@/core/types"
 import { LanguageRegistry } from "@/parsers/languages/LanguageRegistry"
-import { ILanguageStrategy, SymbolInfo } from "@/parsers/languages/ILanguageStrategy"
 
 class MockTypeScriptStrategy implements ILanguageStrategy {
   readonly language = "typescript"
@@ -43,7 +42,7 @@ describe("RAG Pipeline integration", () => {
   it("parses markdown and builds context for a doc query", async () => {
     const parser = new SemanticDocumentParser(500, 50)
     const content = `# Overview\n\nThis system is a RAG pipeline.\n\n## Features\n\nSupports docs and code.`
-    const chunks = await parser.parse(content, "overview.md")
+    const { chunks } = await parser.parse(content, "overview.md")
 
     expect(chunks.length).toBeGreaterThan(0)
     expect(chunks[0].content).toContain("RAG pipeline")
@@ -62,24 +61,38 @@ describe("RAG Pipeline integration", () => {
 
   it("parses TypeScript code and builds context for a code query", async () => {
     const mockRegistry = LanguageRegistry.create([new MockTypeScriptStrategy()])
-    const parser = new CodeStructuralParser(mockRegistry)
+    const parser = new UnifiedCodeParser()
     const code = `export class DataService {\n  async fetchData(id: string): Promise<string> {\n    return \`data-\${id}\`;\n  }\n}`
-    const chunks = await parser.parse(code, "service.ts")
 
-    expect(chunks.length).toBeGreaterThan(0)
-    const clsChunk = chunks.find((c) => c.metadata.symbolName === "DataService")
-    expect(clsChunk).toBeDefined()
+    // Create a temporary file for the parser
+    const fs = await import("fs/promises")
+    const os = await import("os")
+    const path = await import("path")
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "rag-test-"))
+    const tmpFile = path.join(tmpDir, "service.ts")
+    await fs.writeFile(tmpFile, code, "utf-8")
 
-    const retrieved: RetrievedChunk[] = chunks.map((c) => ({
-      chunk: c,
-      score: 0.85,
-      storeType: "code" as const,
-    }))
+    try {
+      const parsed = await parser.parse(tmpFile)
+      const chunks = parsed.chunks
 
-    const builder = new ContextBuilder()
-    const context = builder.build(retrieved)
-    expect(context).toContain("CODE")
-    expect(context).toContain("DataService")
+      expect(chunks.length).toBeGreaterThan(0)
+      const clsChunk = chunks.find((c) => isCodeChunk(c) && c.metadata.symbolName === "DataService")
+      expect(clsChunk).toBeDefined()
+
+      const retrieved: RetrievedChunk[] = chunks.map((c) => ({
+        chunk: c,
+        score: 0.85,
+        storeType: "code" as const,
+      }))
+
+      const builder = new ContextBuilder()
+      const context = builder.build(retrieved)
+      expect(context).toContain("CODE")
+      expect(context).toContain("DataService")
+    } finally {
+      await fs.rm(tmpDir, { recursive: true, force: true })
+    }
   })
 
   it("HybridRetriever merges and sorts by score", async () => {

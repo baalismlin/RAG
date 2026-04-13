@@ -1,4 +1,4 @@
-import { QueryType } from "@/core/types/Document"
+import { QueryType } from "@/core/types"
 
 export const SYSTEM_PROMPT = `You are a precise technical assistant. You answer questions strictly based on the provided context.
 Rules:

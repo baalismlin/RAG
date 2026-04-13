@@ -1,5 +1,4 @@
 import { SYSTEM_PROMPT, buildUserPrompt } from "@/rag/PromptTemplates"
-import { QueryType } from "@/core/types/Document"
 
 describe("PromptTemplates", () => {
   describe("SYSTEM_PROMPT", () => {

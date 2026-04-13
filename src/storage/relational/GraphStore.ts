@@ -1,5 +1,5 @@
 import { IGraphStore } from "@/core/interfaces/IGraphStore"
-import { SymbolRelation, RelationType, TraversalNode } from "@/core/types/CodeKnowledge"
+import { SymbolRelation, RelationType, TraversalNode } from "@/core/types"
 import { getPool } from "@/storage/relational/PostgresClient"
 import { SymbolStore } from "@/storage/relational/SymbolStore"
 

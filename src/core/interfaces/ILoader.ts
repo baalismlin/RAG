@@ -1,4 +1,4 @@
-import { AnyChunk } from "../types/Document"
+import { ParsedResult } from "../types"
 
 /**
  * Loader interface for reading files from disk and producing chunks.
@@ -18,7 +18,7 @@ export interface ILoader {
    * @param filePath - Absolute or relative path to the file to load
    * @returns Array of chunks extracted from the file
    */
-  load(filePath: string): Promise<AnyChunk[]>
+  load(filePath: string): Promise<ParsedResult>
 
   /**
    * Check if this loader can handle the given file.

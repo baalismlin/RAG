@@ -1,4 +1,4 @@
-import { RetrievedChunk } from "../types/QueryResult"
+import { RetrievedChunk } from "../types"
 
 /**
  * Retriever interface for fetching relevant chunks from a vector store.

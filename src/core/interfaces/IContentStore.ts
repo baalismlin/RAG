@@ -1,7 +1,5 @@
 import { IStorage } from "./IStorage"
-import { AnyChunk } from "../types/Document"
-import { CodeSymbol, SymbolRelation } from "../types/CodeKnowledge"
-import { RetrievedChunk } from "../types/QueryResult"
+import { CodeSymbol, SymbolRelation, AnyChunk, RetrievedChunk } from "../types"
 
 /**
  * Base interface for content stores (DocumentStore and CodeKnowledgeStore).

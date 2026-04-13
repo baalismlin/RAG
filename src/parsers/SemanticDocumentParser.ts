@@ -1,6 +1,6 @@
 import { createHash } from "crypto"
 import { IDocumentParser } from "@/core/interfaces/IParser"
-import { DocumentChunk } from "@/core/types/Document"
+import { DocumentChunk, ParsedResult } from "@/core/types"
 
 function chunkId(source: string, index: number): string {
   return createHash("sha256").update(`${source}::${index}`).digest("hex").slice(0, 32)
@@ -18,7 +18,7 @@ export class SemanticDocumentParser implements IDocumentParser {
     this.chunkOverlap = chunkOverlap
   }
 
-  async parse(content: string, source: string): Promise<DocumentChunk[]> {
+  async parse(content: string, source: string): Promise<ParsedResult> {
     const sections = this.splitBySections(content)
     const chunks: DocumentChunk[] = []
 
@@ -38,7 +38,7 @@ export class SemanticDocumentParser implements IDocumentParser {
       }
     }
 
-    return chunks.length > 0 ? chunks : this.fallbackChunk(content, source)
+    return { chunks: chunks.length > 0 ? chunks : this.fallbackChunk(content, source) }
   }
 
   private splitBySections(content: string): Array<{ heading: string; content: string }> {

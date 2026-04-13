@@ -1,5 +1,5 @@
 import { IStorage } from "./IStorage"
-import { CodeSymbol, SymbolKind } from "../types/CodeKnowledge"
+import { CodeSymbol, SymbolKind } from "../types"
 
 export interface SymbolLookupOptions {
   name?: string

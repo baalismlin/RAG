@@ -1,6 +1,6 @@
 import { IRetriever } from "@/core/interfaces/IRetriever"
 import { IVectorStore } from "@/core/interfaces/IVectorStore"
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import { RetrievedChunk } from "@/core/types"
 import { config } from "@/lib/config"
 
 export class CodeRetriever implements IRetriever {

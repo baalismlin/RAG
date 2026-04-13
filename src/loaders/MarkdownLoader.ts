@@ -1,8 +1,7 @@
 import * as fs from "fs/promises"
 import * as path from "path"
-import { v4 as uuidv4 } from "uuid"
 import { ILoader } from "@/core/interfaces/ILoader"
-import { DocumentChunk } from "@/core/types/Document"
+import { ParsedResult } from "@/core/types"
 import { SemanticDocumentParser } from "@/parsers/SemanticDocumentParser"
 
 export class MarkdownLoader implements ILoader {
@@ -18,17 +17,8 @@ export class MarkdownLoader implements ILoader {
     return this.supportedExtensions.includes(ext)
   }
 
-  async load(filePath: string): Promise<DocumentChunk[]> {
+  async load(filePath: string): Promise<ParsedResult> {
     const content = await fs.readFile(filePath, "utf-8")
-    const chunks = await this.parser.parse(content, filePath)
-    return chunks.map((chunk, i) => ({
-      ...chunk,
-      id: chunk.id || uuidv4(),
-      metadata: {
-        ...chunk.metadata,
-        totalChunks: chunks.length,
-        chunkIndex: i,
-      },
-    }))
+    return await this.parser.parse(content, filePath)
   }
 }

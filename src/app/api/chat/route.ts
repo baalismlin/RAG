@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getRAGService } from "@/lib/ragServiceFactory"
-import { ChatMessage } from "@/core/types/QueryResult"
+import { ChatMessage } from "@/core/types"
 
 export async function POST(req: NextRequest) {
   try {

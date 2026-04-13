@@ -1,8 +1,7 @@
 import { ChromaClient, Collection } from "chromadb"
 import { IVectorStore } from "@/core/interfaces/IVectorStore"
 import { IEmbedding } from "@/core/interfaces/IEmbedding"
-import { AnyChunk } from "@/core/types/Document"
-import { RetrievedChunk } from "@/core/types/QueryResult"
+import { AnyChunk, RetrievedChunk } from "@/core/types"
 import { config } from "@/lib/config"
 
 /**
@@ -67,7 +66,7 @@ export class ChromaDocumentVectorStore implements IVectorStore {
           id: ids[i],
           content: documents[i] ?? "",
           metadata: metadatas[i] as unknown as AnyChunk["metadata"],
-        },
+        } as AnyChunk,
         score: 1 - (distances[i] ?? 0),
         storeType: "document",
       })

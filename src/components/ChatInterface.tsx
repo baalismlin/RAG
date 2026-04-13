@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, FormEvent } from "react"
-import { ChatMessage, QueryResult } from "@/core/types/QueryResult"
+import { ChatMessage, QueryResult } from "@/core/types"
 import { MessageBubble } from "./MessageBubble"
 
 function LoadingDots() {
